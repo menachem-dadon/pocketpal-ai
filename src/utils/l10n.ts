@@ -2366,4 +2366,806 @@ export const l10n = {
       downloadSetupFailedMessage: '无法准备模型下载: {message}',
     },
   },
+
+  he: {
+    common: {
+      cancel: 'בטל',
+      delete: 'מחק',
+      dismiss: 'דחייה',
+      rename: 'שנה שם',
+      reset: 'איפוס',
+      save: 'שמור',
+      update: 'עדכון',
+      networkError: 'שגיאת רשת. אנא נסה שנית.',
+      downloadETA: 'ETA',
+      calculating: 'חישוב...',
+      second: 'שנייה',
+      seconds: 'שניות',
+      year: 'שנה',
+      years: 'שנים',
+      month: 'חודש',
+      months: 'חודשים',
+      week: 'שבוע',
+      weeks: 'שבועות',
+      day: 'יום',
+      days: 'ימים',
+      hour: 'שעה',
+      hours: 'שעות',
+      minute: 'דקה',
+      minutes: 'דקות',
+      justNow: 'כעת',
+    },
+    settings: {
+      // Model Initialization Settings
+      modelInitializationSettings: 'הגדרות אתחול מודל',
+      // Metal Settings
+      metal: 'Metal',
+      metalDescription: "API מואץ חומרה של אפל.",
+      metalRequiresNewerIOS:
+        'האצת Metal דורשת iOS 18 ומעלה. אנא שדרגו את המכשיר שלכם כדי להשתמש בתכונה זו.',
+      layersOnGPU: 'Layers on GPU: {{gpuLayers}}',
+      // Context Size
+      contextSize: 'אורך הקשר',
+      contextSizePlaceholder: 'הזן אורך הקשר (לפחות {{minContextSize}})',
+      invalidContextSizeError:
+        'אנא הזן מספר תקין (לפחות {{minContextSize}})',
+      modelReloadNotice: 'יש לטעון את המודל בכדי שהשינויים ייכנסו לתוקף.',
+      // Advanced Settings
+      advancedSettings: 'הגדרות מתקדמות',
+      // Batch Size
+      batchSize: 'אורך אצווה',
+      batchSizeDescription: 'אורך אצווה: {{batchSize}}{{effectiveBatch}}',
+      effectiveLabel: 'יעיל',
+      // Physical Batch Size
+      physicalBatchSize: 'אורך אצווה פיזי',
+      physicalBatchSizeDescription:
+        'אורך אצווה פיזי: {{physicalBatchSize}}{{effectivePhysicalBatch}}',
+      // Thread Count
+      cpuThreads: 'CPU Threads',
+      cpuThreadsDescription:
+        'Using {{threads}} of {{maxThreads}} available threads',
+      // Flash Attention
+      flashAttention: 'Flash Attention',
+      flashAttentionDescription: 'הפעל את Flash Attention לעיבוד מהיר יותר',
+      // Cache Type K
+      keyCacheType: 'Key Cache Type',
+      keyCacheTypeDescription: 'בחר את סוג המטמון לחישוב המפתחות',
+      keyCacheTypeDisabledDescription:
+        'הפעל את Flash Attention כדי לשנות את סוג המטמון',
+      // Cache Type V
+      valueCacheType: 'Value Cache Type',
+      valueCacheTypeDescription: 'Select the cache type for value computation',
+      valueCacheTypeDisabledDescription:
+        'Enable Flash Attention to change cache type',
+      // Model Loading Settings
+      modelLoadingSettings: 'הגדרות טעינת מודל',
+      // Auto Offload/Load
+      autoOffloadLoad: 'פריקה/טעינה אוטומטית',
+      autoOffloadLoadDescription: 'פריקת מודל כאשר האפליקציה נמצאת ברקע.',
+      // Auto Navigate to Chat
+      autoNavigateToChat: "ניווט אוטומטי לצ'אט",
+      autoNavigateToChatDescription: "נווט לצ'אט כאשר הטעינה מתחילה.",
+      // App Settings
+      appSettings: 'הגדרות אפליקציה',
+      // Language
+      language: 'שפה',
+      // Dark Mode
+      darkMode: 'מצב כהה',
+      // Display Memory Usage
+      displayMemoryUsage: 'הצג ניצול זיכרון',
+      displayMemoryUsageDescription: "הצגת ניצול הזיכרון בדף הצ'אט.",
+      // API Settings
+      apiSettingsTitle: 'הגדרות API',
+      // Hugging Face Token
+      huggingFaceTokenLabel: 'אסימון Hugging Face',
+      tokenIsSetDescription:
+        'האסימון הוגדר. נדרש לגישה למודלים עם הגבלות שימוש.',
+      setTokenDescription:
+        'הגדר אסימון לגישה למודלים מוגבלי שימוש מ-Hugging Face.',
+      setTokenButton: 'הגדר טוקן',
+      useHfTokenLabel: 'השתמש באסימון HF',
+      useHfTokenDescription:
+        'אפשר שימוש באסימון עבור בקשות API. השבת אם האסימון גורם לבעיות אימות.',
+    },
+    memory: {
+      shortWarning: 'אזהרת זיכרון',
+      warning:
+        'אזהרה: גודל המודל עשוי לחרוג מהזיכרון הזמין. הדבר עלול להשפיע על ביצועי המכשיר ויציבותו.',
+    },
+    storage: {
+      checkFailed: 'בדיקת האחסון נכשלה',
+      lowStorage: 'אחסון נמוך! מודל {{modelSize}} > {{freeSpace}} פנוי',
+    },
+    generation: {
+      modelNotInitialized: 'הקשר המודל לא אותחל',
+      failedToGenerate: 'יצירת פלט נכשלה',
+    },
+    models: {
+      fileManagement: {
+        fileAlreadyExists: 'הקובץ כבר קיים',
+        fileAlreadyExistsMessage:
+          'כבר קיים קובץ בשם זה. מה תרצה לעשות??',
+        replace: 'החלף',
+        keepBoth: 'שמור את שניהם',
+      },
+      labels: {
+        localModel: 'מקומי',
+        hfModel: 'HF',
+        unknownGroup: 'לא ידוע',
+        availableToUse: 'מוכן לשימוש',
+        availableToDownload: 'זמין להורדה',
+        useAddButtonForMore: 'השתמש בלחצן + כדי למצוא מודלים נוספים',
+      },
+      buttons: {
+        addFromHuggingFace: 'הוסף מ-Hugging Face',
+        addLocalModel: 'הוסף מודל מקומי',
+        reset: 'איפוס',
+      },
+      modelsHeaderRight: {
+        menuTitleHf: 'מודלי Hugging Face',
+        menuTitleDownloaded: 'הורד מודלים',
+        menuTitleGrouped: 'קבץ לפי סוג מודל',
+        menuTitleReset: 'אפס רשימת מודלים',
+      },
+      modelsResetDialog: {
+        proceedWithReset: 'המשך עם איפוס',
+        confirmReset: 'אישור איפוס',
+      },
+      chatTemplate: {
+        label: "תבנית צ'אט בסיסית:",
+      },
+      details: {
+        title: 'קבצי GGUF זמינים',
+      },
+      modelFile: {
+        alerts: {
+          cannotRemoveTitle: 'לא ניתן להסיר',
+          modelPreset: 'מודל מוגדר מראש.',
+          downloadedFirst:
+            'המודל הורד. אנא מחק תחילה את הקובץ.',
+          removeTitle: 'הסר מודל',
+          removeMessage:
+            'האם אתה בטוח שברצונך להסיר את המודל הזה מהרשימה?',
+          removeError: 'הסרת המודל נכשלה.',
+          alreadyDownloadedTitle: 'המודל כבר הורד',
+          alreadyDownloadedMessage: 'כבר הורדת את המודל הזה.',
+          deleteTitle: 'מחק מודל',
+          deleteMessage:
+            'האם אתה בטוח שברצונך למחוק את המודל שהורדת?
+',
+        },
+        buttons: {
+          remove: 'הסר',
+        },
+        warnings: {
+          storage: {
+            message: 'אין מספיק שטח אחסון זמין.',
+            shortMessage: 'אחסון נמוך',
+          },
+          memory: {
+            message:
+              "גודל המודל קרוב לזיכרון הכולל של המכשיר שלך או חורג ממנו. הדבר עלול לגרום להתנהגות בלתי צפויה.",
+          },
+          legacy: {
+            message: 'פורמט כימות מדור קודם - ייתכן שהמודל לא יפעל.',
+            shortMessage: 'כימות מדור קודם',
+          },
+          multiple: '{count} אזהרות',
+        },
+        labels: {
+          downloadSpeed: '{speed}',
+        },
+      },
+      search: {
+        noResults: 'לא נמצאו מודלים',
+        loadingMore: 'טוען עוד...',
+        searchPlaceholder: 'חפש מודלים של Hugging Face',
+        modelUpdatedLong: 'עודכן לפני {{time}}',
+        modelUpdatedShort: 'לפני {{time}}',
+        modelUpdatedJustNowLong: 'עודכן עכשיו',
+        modelUpdatedJustNowShort: 'עכשיו',
+        errorOccurred: 'לא ניתן לטעון מודלים. אנא נסה שוב.',
+      },
+      modelCard: {
+        alerts: {
+          deleteTitle: 'מחק מודל',
+          deleteMessage:
+            'האם אתה בטוח שברצונך למחוק את המודל שהורדת?',
+          removeTitle: 'הסר מודל',
+          removeMessage:
+            'האם אתה בטוח שברצונך להסיר את המודל הזה מהרשימה?',
+        },
+        buttons: {
+          settings: 'הגדרות',
+          download: 'הורד',
+          remove: 'הסר',
+          load: 'טען',
+          offload: 'פרוק',
+        },
+        labels: {
+          skills: 'מיומנויות: ',
+        },
+      },
+      modelSettings: {
+        template: {
+          label: 'תבנית:',
+          editButton: 'ערוך',
+          dialogTitle: "ערוך תבנית צ'אט",
+          note1:
+            'הודעה: שינוי התבנית עשוי לשנות את BOS, EOS ואת בקשת המערכת.',
+          note2: "משתמש בנונג'אקים. השאר ריק כדי להשתמש בתבנית של המודל.",
+          placeholder: "הזן את תבנית הצ'אט שלך כאן",
+          closeButton: 'סגור',
+        },
+        stopWords: {
+          label: 'מילות עצירה',
+          placeholder: 'הוסף מילת עצירה חדשה',
+        },
+        tokenSettings: {
+          bos: 'BOS',
+          eos: 'EOS',
+          addGenerationPrompt: 'הוסף בקשת עצירה',
+          bosTokenPlaceholder: 'אסימון BOS',
+          eosTokenPlaceholder: 'אסימון EOS',
+          systemPrompt: 'הוראות מערכת',
+        },
+      },
+      modelDescription: {
+        size: 'Size: ',
+        parameters: 'פרמטרים: ',
+        separator: ' | ',
+        notAvailable: 'N/A',
+      },
+      modelCapabilities: {
+        questionAnswering: 'Question Answering',
+        summarization: 'Summarization',
+        reasoning: 'Reasoning',
+        roleplay: 'Role-play',
+        instructions: 'Instruction following',
+        code: 'Code generation',
+        math: 'Math solving',
+        multilingual: 'Multilingual',
+        rewriting: 'Rewriting',
+        creativity: 'Creative writing',
+      },
+    },
+    completionParams: {
+      grammar:
+        'Enforce specific grammar rules to ensure the generated text follows a particular structure or format',
+      stop: 'Define specific phrases that will stop text generation',
+      n_predict: 'Set how long the generated response should be (in tokens)',
+      n_probs: 'Show probability scores for alternative words.',
+      top_k:
+        'Control creativity by limiting word choices to the K most likely options. Lower values make responses more focused',
+      top_p:
+        'Balance creativity and coherence. Higher values (near 1.0) allow more creative but potentially less focused responses',
+      min_p:
+        'The minimum probability for a token to be considered. Filter out unlikely words to reduce nonsensical or out-of-context responses',
+      temperature:
+        'Control creativity vs predictability. Higher values make responses more creative but less focused',
+      penalty_last_n:
+        'How far back to check for repetition. Larger values help prevent long-term repetition',
+      penalty_repeat:
+        'Discourage word repetition. Higher values make responses use more diverse language',
+      penalty_freq:
+        'Penalize overused words. Higher values encourage using a broader vocabulary',
+      penalty_present:
+        'Reduce repetition of themes and ideas. Higher values encourage more diverse content',
+      mirostat:
+        'Enable advanced control over response creativity. Set to 1 or 2 (smoother) for smart, real-time adjustments to randomness and coherence.',
+      mirostat_tau:
+        'Set the target creativity level for Mirostat. Higher values allow for more diverse and imaginative responses, while lower values ensure more focused outputs.',
+      mirostat_eta:
+        'How quickly Mirostat adjusts creativity. Higher values mean faster adjustments',
+      dry_multiplier:
+        "Strength of the DRY (Don't Repeat Yourself) feature. Higher values strongly prevent repetition",
+      dry_base:
+        'Base penalty for repetition in DRY mode. Higher values are more aggressive at preventing repetition',
+      dry_allowed_length:
+        'How many words can repeat before DRY penalty kicks in',
+      dry_penalty_last_n: 'How far back to look for repetition in DRY mode',
+      dry_sequence_breakers:
+        'Symbols that reset the repetition checker in DRY mode',
+      ignore_eos:
+        'Continue generating even if the model wants to stop. Useful for forcing longer responses',
+      logit_bias:
+        'Influence how likely specific words are to appear in the response',
+      seed: 'Set the random number generator seed. Useful for reproducible results',
+      xtc_probability:
+        'Set the chance for token removal via XTC sampler. 0 is disabled',
+      xtc_threshold:
+        'Set a minimum probability threshold for tokens to be removed via XTC sampler. (> 0.5 disables XTC)',
+      typical_p:
+        'Enable locally typical sampling with parameter p. 1.0 is disabled',
+    },
+    about: {
+      screenTitle: 'App Info',
+      description:
+        'An app that brings language models directly to your phone. Sits on the shoulders of llama.cpp and llama.rn.',
+      supportProject: 'Support the Project',
+      supportProjectDescription:
+        'If you enjoy using PocketPal AI, please consider supporting the project by:',
+      githubButton: 'Star on GitHub',
+      orText: 'or',
+      orBy: 'or by',
+      sponsorButton: 'Become a Sponsor',
+      versionCopiedTitle: 'Version copied',
+      versionCopiedDescription:
+        'Version information has been copied to clipboard',
+    },
+    feedback: {
+      title: 'Send Feedback',
+      description:
+        'Your voice matters! Tell us how PocketPal AI is helping you and what we can do to make it even more useful.',
+      shareThoughtsButton: 'Sharing your thoughts',
+      useCase: {
+        label: 'What are you using PocketPal AI for?',
+        placeholder: 'e.g., summarization, roleplay, etc.',
+      },
+      featureRequests: {
+        label: 'Feature Request',
+        placeholder: 'What features would you like to see?',
+      },
+      generalFeedback: {
+        label: 'General Feedback',
+        placeholder: 'Share any other thoughts you may have.',
+      },
+      usageFrequency: {
+        label: 'How often do you use PocketPal AI? (Optional)',
+        options: {
+          daily: 'Daily',
+          weekly: 'Weekly',
+          monthly: 'Monthly',
+          rarely: 'Rarely',
+        },
+      },
+      email: {
+        label: 'Contact Email (Optional)',
+        placeholder: 'Your email address',
+      },
+      submit: 'Submit Feedback',
+      validation: {
+        required: 'Please provide at least some feedback',
+      },
+      success: 'Thank you for your feedback!',
+      error: {
+        general: 'Error sending feedback. Please try again.',
+      },
+    },
+    components: {
+      attachmentButton: {
+        attachmentButtonAccessibilityLabel: 'Send media',
+      },
+      bubble: {
+        timingsString:
+          '{{predictedMs}}ms per token, {{predictedPerSecond}} tokens per second',
+      },
+      chatEmptyPlaceholder: {
+        noModelsTitle: 'No Models Available',
+        noModelsDescription:
+          'Download a model to start chatting with PocketPal',
+        noModelsButton: 'Download Model',
+        activateModelTitle: 'Activate Model To Get Started',
+        activateModelDescription:
+          'Select the model and download it. After downloading, tap Load next to the model and start chatting.',
+        activateModelButton: 'Select Model',
+        loading: 'Loading...',
+      },
+      chatInput: {
+        inputPlaceholder: 'Message',
+      },
+      chatGenerationSettingsSheet: {
+        invalidValues: 'Invalid Values',
+        invalidNumericValuesMessage: 'Must be a valid number',
+        pleaseCorrect: 'Please correct the following:',
+        ok: 'OK',
+        saveChanges: 'Save Changes',
+        saveAsPreset: 'Save as Preset',
+        title_session: 'Chat Generation Settings (Session)',
+        title_preset: 'Chat Generation Settings (Preset)',
+        resetToSystemDefaults: 'Reset to System Defaults',
+        resetToPreset: 'Reset to Preset',
+        applytoPresetAlert: {
+          title: 'Success',
+          message: 'These settings will be applied to all future sessions',
+        },
+      },
+      chatHeaderTitle: {
+        defaultTitle: 'Chat',
+      },
+      fileMessage: {
+        fileButtonAccessibilityLabel: 'File',
+      },
+      chatPalModelPickerSheet: {
+        modelsTab: 'Models',
+        palsTab: 'Pals',
+        noPal: 'No Pal',
+        disablePal: 'Disable active pal',
+        noDescription: 'No description',
+        assistantType: 'Assistant',
+        roleplayType: 'Roleplay',
+        confirmationTitle: 'Confirmation',
+        modelSwitchMessage:
+          "This pal has a different default model ({{modelName}}). Would you like to switch to the pal's default model?",
+        keepButton: 'Keep',
+        switchButton: 'Switch',
+      },
+      downloadErrorDialog: {
+        downloadFailedTitle: 'Download Failed',
+        downloadFailedMessage: 'Failed to download model: {message}',
+        unauthorizedTitle: 'Authentication Failed',
+        unauthorizedMessage:
+          'Your Hugging Face token appears to be invalid or expired. Please update your token in the settings.',
+        forbiddenTitle: 'Access Denied',
+        forbiddenMessage:
+          'You do not have permission to access this model. Please ensure:',
+        forbiddenSteps: [
+          'Your token has "read" permission',
+          'You requested and were granted access to this model',
+          'The model owner approved your access request',
+        ],
+        getTokenTitle: 'Get Hugging Face Token',
+        getTokenMessage:
+          'This model requires a Hugging Face token to download.',
+        getTokenSteps: [
+          'Go to huggingface.co and sign in',
+          'Navigate to Settings > Access Tokens',
+          'Create a new token with "read" access',
+          'Copy the token and paste it in the token field',
+        ],
+        tokenDisabledTitle: 'Token is Disabled',
+        tokenDisabledMessage:
+          'You have a Hugging Face token set, but it is currently disabled. This model requires a token to download. Enable your token to continue.',
+        enableAndRetry: 'Enable and Retry',
+        goToSettings: 'Go to Settings',
+        tryAgain: 'Try Again',
+        viewOnHuggingFace: 'View Model on HF ↗',
+      },
+      headerRight: {
+        deleteChatTitle: 'Delete Chat',
+        deleteChatMessage: 'Are you sure you want to delete this chat?',
+        generationSettings: 'Generation settings',
+        model: 'Model',
+        duplicateChatHistory: 'Duplicate chat history',
+        makeChatTemporary: 'Make chat temporary',
+        exportChatSession: 'Export chat session',
+      },
+      hfTokenSheet: {
+        title: 'Hugging Face Token',
+        description: 'Required to access gated models',
+        inputLabel: 'Personal Access Token',
+        inputPlaceholder: 'Paste your token here',
+        save: 'Save Token',
+        saved: 'Token saved successfully',
+        reset: 'Reset Token',
+        resetSuccess: 'Token removed successfully',
+        instructions: 'How to get a token:',
+        instructionsSteps: [
+          'Go to huggingface.co and sign in',
+          'Navigate to Settings > Access Tokens',
+          'Create a new token with "read" access',
+          'Copy the token and paste it below',
+        ],
+        getTokenLink: 'Get a token from huggingface.co ↗',
+        error: {
+          saving: 'Error saving token',
+          missing: 'Hugging Face token required',
+          invalid: 'Invalid or expired token',
+          gatedModelAccess: 'Access to this gated model was denied',
+        },
+        gatedModelIndicator: 'Requires Token',
+        tokenRequired: 'This model requires a Hugging Face access token',
+        searchErrorHint:
+          'Your Hugging Face API token is invalid or expired. To continue searching, please either remove the token or disable token authentication in Settings.',
+        disableAndRetry: 'Disable Token & Retry',
+      },
+      modelSettingsSheet: {
+        modelSettings: 'Model Settings',
+        saveChanges: 'Save Changes',
+      },
+      modelsHeaderRight: {
+        menuTitleHf: 'Hugging Face Models',
+        menuTitleDownloaded: 'Downloaded Models',
+        menuTitleGrouped: 'Group by Model Type',
+        menuTitleReset: 'Reset Models List',
+      },
+      modelsResetDialog: {
+        proceedWithReset: 'Proceed with Reset',
+        confirmReset: 'Confirm Reset',
+      },
+      assistantPalSheet: {
+        title: {
+          create: 'Create Assistant Pal',
+          edit: 'Edit Assistant Pal',
+        },
+        palName: 'Pal Name',
+        palNamePlaceholder: 'Name',
+        defaultModel: 'Default Model',
+        defaultModelPlaceholder: 'Select model',
+        validation: {
+          generatingPromptRequired: 'Generating prompt is required',
+          promptModelRequired: 'Prompt generation model is required',
+        },
+        create: 'Create',
+      },
+      modelNotAvailable: {
+        noModelsDownloaded:
+          'You do not have any models downloaded yet. Please download a model first.',
+        downloadAModel: 'Download a model',
+        defaultModelNotDownloaded:
+          'Default model is not downloaded yet. Please download it first.',
+        cancelDownload: 'Cancel download',
+        download: 'Download',
+      },
+      roleplayPalSheet: {
+        title: {
+          create: 'Create Roleplay Pal',
+          edit: 'Edit Roleplay Pal',
+        },
+        palName: 'Pal Name',
+        palNamePlaceholder: 'Name',
+        defaultModel: 'Default Model',
+        defaultModelPlaceholder: 'Select model',
+        descriptionSection: 'Description',
+        world: 'World',
+        worldPlaceholder: 'Fantasy',
+        location: 'Location',
+        locationPlaceholder: 'Enchanted Forest',
+        locationSublabel: 'Where does the story take place?',
+        aiRole: "AI's Role",
+        aiRolePlaceholder: 'Eldara, a mischievous forest sprite',
+        aiRoleSublabel: 'Set the role for character',
+        userRole: 'User Role',
+        userRolePlaceholder: 'Sir Elandor, a brave knight',
+        userRoleSublabel: 'Who are you?',
+        situation: 'Situation',
+        situationPlaceholder: 'Rescue mission, solving a mystery',
+        toneStyle: 'Tone/Style',
+        toneStylePlaceholder: 'Serious',
+        validation: {
+          promptModelRequired: 'Prompt generation model is required',
+        },
+        create: 'Create',
+      },
+      sendButton: {
+        accessibilityLabel: 'Send',
+      },
+      systemPromptSection: {
+        sectionTitle: 'System Prompt',
+        useAIPrompt: 'Use AI to generate system prompt',
+        modelSelector: {
+          label: 'Select Model for Generation*',
+          sublabel: 'Recommended: Llama 3.2 3B or Qwen2.5 3B.',
+          placeholder: 'Select model',
+        },
+        generatingPrompt: {
+          label: 'Generating Prompt',
+          placeholder: 'Enter prompt for generation',
+        },
+        buttons: {
+          loadingModel: 'Loading model...',
+          stopGenerating: 'Stop Generating',
+          generatePrompt: 'Generate System Prompt',
+        },
+        systemPrompt: {
+          label: 'System Prompt',
+          sublabel:
+            'Feel free to edit and experiment to find the optimal prompt for your scenario',
+          placeholder: 'You are a helpful assistant',
+        },
+        warnings: {
+          promptChanged: 'System prompt has been manually changed',
+        },
+      },
+      sidebarContent: {
+        menuItems: {
+          chat: 'Chat',
+          models: 'Models',
+          pals: 'Pals',
+          benchmark: 'Benchmark',
+          settings: 'Settings',
+          appInfo: 'App Info',
+          testCompletion: 'Test Completion',
+        },
+        deleteChatTitle: 'Delete Chat',
+        deleteChatMessage: 'Are you sure you want to delete this chat?',
+        dateGroups: {
+          today: 'Today',
+          yesterday: 'Yesterday',
+          thisWeek: 'This week',
+          lastWeek: 'Last week',
+          twoWeeksAgo: '2 weeks ago',
+          threeWeeksAgo: '3 weeks ago',
+          fourWeeksAgo: '4 weeks ago',
+          lastMonth: 'Last month',
+          older: 'Older',
+        },
+      },
+      usageStats: {
+        tooltip: {
+          title: 'Memory Usage',
+          used: 'Used: ',
+          total: 'Total: ',
+          usage: 'Usage: ',
+        },
+        byteSizes: ['Bytes', 'KB', 'MB', 'GB'],
+      },
+    },
+    validation: {
+      nameRequired: 'Name is required',
+      systemPromptRequired: 'System prompt is required',
+      worldRequired: 'World is required',
+      locationRequired: 'Location is required',
+      aiRoleRequired: "AI's role is required",
+      userRoleRequired: 'User role is required',
+      situationRequired: 'Situation is required',
+      toneStyleRequired: 'Tone/Style is required',
+    },
+    screenTitles: {
+      chat: 'Chat',
+      models: 'Models',
+      pals: 'Pals (experimental)',
+      benchmark: 'Benchmark',
+      settings: 'Settings',
+      appInfo: 'App Info',
+      testCompletion: 'Test Completion',
+    },
+    chat: {
+      conversationReset: 'Conversation reset!',
+      modelNotLoaded: 'Model not loaded. Please initialize the model.',
+      completionFailed: 'Completion failed: ',
+      loadingModel: 'Loading model ...',
+      typeYourMessage: 'Type your message here',
+      load: 'Load',
+      goToModels: 'Go to Models',
+      readyToChat: 'Ready to chat? Load the last used model.',
+      pleaseLoadModel: 'Load a model to chat.',
+    },
+    benchmark: {
+      title: 'Benchmark',
+      modelSelector: {
+        prompt: 'Select Model',
+      },
+      buttons: {
+        advancedSettings: 'Advanced Settings',
+        startTest: 'Start Test',
+        runningTest: 'Running Test...',
+        clearAll: 'Clear All',
+        done: 'Done',
+        cancel: 'Cancel',
+        delete: 'Delete',
+        share: 'Share',
+        sharing: 'Sharing...',
+        viewRawData: 'View Raw Data',
+        hideRawData: 'Hide Raw Data',
+      },
+      messages: {
+        pleaseSelectModel: 'Please select and initialize a model first',
+        testWarning:
+          'Note: Test could run for up to 2-5 minutes for larger models and cannot be interrupted once started.',
+        keepScreenOpen: 'Please keep this screen open.',
+        initializingModel: 'Initializing model...',
+        modelMaxValue: '(max: {{maxValue}})',
+      },
+      dialogs: {
+        advancedSettings: {
+          title: 'Advanced Settings',
+          testProfile: 'Test Profile',
+          customParameters: 'Custom Parameters',
+          description:
+            'Fine-tune the benchmark parameters for specific testing scenarios.',
+        },
+        deleteResult: {
+          title: 'Delete Result',
+          message: 'Are you sure you want to delete this benchmark result?',
+        },
+        clearAllResults: {
+          title: 'Clear All Results',
+          message: 'Are you sure you want to delete all benchmark results?',
+        },
+        shareResults: {
+          title: 'Share Benchmark Results',
+          sharedDataTitle: 'Shared data includes:',
+          deviceAndModelInfo: '• Device specs & model info',
+          performanceMetrics: '• Performance metrics',
+          dontShowAgain: "Don't show this message again",
+        },
+      },
+      sections: {
+        testResults: 'Test Results',
+      },
+      benchmarkResultCard: {
+        modelMeta: {
+          params: 'params',
+        },
+        config: {
+          title: 'Benchmark Config',
+          format: 'PP: {{pp}} • TG: {{tg}} • PL: {{pl}} • Rep: {{nr}}',
+        },
+        modelSettings: {
+          title: 'Model Settings',
+          context: 'Context: {{context}}',
+          batch: 'Batch: {{batch}}',
+          ubatch: 'UBatch: {{ubatch}}',
+          cpuThreads: 'CPU Threads: {{threads}}',
+          gpuLayers: 'GPU Layers: {{layers}}',
+          flashAttentionEnabled: 'Flash Attention Enabled',
+          flashAttentionDisabled: 'Flash Attention Disabled',
+          cacheTypes: 'Cache Types: {{cacheK}}/{{cacheV}}',
+        },
+        results: {
+          promptProcessing: 'Prompt Processing',
+          tokenGeneration: 'Token Generation',
+          totalTime: 'Total Time',
+          peakMemory: 'Peak Memory',
+          tokensPerSecond: 't/s',
+        },
+        actions: {
+          deleteButton: '',
+          submittedText: '✓ Shared to',
+          leaderboardLink: 'AI Phone Leaderboard ↗',
+          cannotShare: 'Cannot share',
+          cannotShareTooltip: 'Local model results cannot be shared',
+          submitButton: 'Submit to Leaderboard',
+          viewLeaderboard: 'View leaderboard ↗',
+        },
+        errors: {
+          networkRetry: 'Check connection & retry',
+          appCheckRetry: 'Retry submission',
+          serverRetry: 'Try again later',
+          genericRetry: 'Retry',
+          failedToSubmit: 'Failed to submit benchmark',
+        },
+      },
+      deviceInfoCard: {
+        title: 'Device Information',
+        deviceSummary: '{{brand}} {{model}} • {{systemName}} {{systemVersion}}',
+        coreSummary: '{{cores}} cores • {{memory}}',
+        sections: {
+          basicInfo: 'Basic Info',
+          cpuDetails: 'CPU Details',
+          appInfo: 'App Info',
+        },
+        fields: {
+          architecture: 'Architecture',
+          totalMemory: 'Total Memory',
+          deviceId: 'Device ID',
+          cpuCores: 'CPU Cores',
+          cpuModel: 'CPU Model',
+          chipset: 'Chipset',
+          instructions: 'Instructions',
+          version: 'Version',
+        },
+        instructions: {
+          format:
+            'FP16: {{fp16}}, DotProd: {{dotProd}}, SVE: {{sve}}, I8MM: {{i8mm}}',
+          yes: '✓',
+          no: '✗',
+        },
+        versionFormat: '{{version}} ({{buildNumber}})',
+      },
+    },
+    errors: {
+      unexpectedError: 'An unexpected error occurred',
+      hfAuthenticationError:
+        'Hugging Face authentication error: Token is missing or invalid',
+      hfAuthenticationErrorSearch:
+        'Hugging Face authentication error: Invalid token',
+      authenticationError: 'Authentication error: Token is missing or invalid',
+      hfAuthorizationError:
+        'Hugging Face authorization error: No permission to access this resource',
+      authorizationError:
+        'Authorization error: No permission to access this resource',
+      hfServerError: 'Hugging Face server error: API server issue',
+      serverError: 'Server error: API server issue',
+      hfNetworkTimeout:
+        'Network timeout: Request to Hugging Face took too long to complete',
+      networkTimeout: 'Network timeout: Request took too long to complete',
+      hfNetworkError: 'Network error: Unable to connect to Hugging Face API',
+      networkError: 'Network error: Unable to connect to API',
+      downloadSetupFailedTitle: 'Download Setup Failed',
+      downloadSetupFailedMessage:
+        'Failed to prepare model for download: {message}',
+    },
+  },
 };
