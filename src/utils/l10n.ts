@@ -2617,48 +2617,48 @@ export const l10n = {
         notAvailable: 'N/A',
       },
       modelCapabilities: {
-        questionAnswering: 'Question Answering',
-        summarization: 'Summarization',
-        reasoning: 'Reasoning',
-        roleplay: 'Role-play',
-        instructions: 'Instruction following',
-        code: 'Code generation',
-        math: 'Math solving',
-        multilingual: 'Multilingual',
-        rewriting: 'Rewriting',
-        creativity: 'Creative writing',
+        questionAnswering: 'מענה לשאלות',
+        summarization: 'סיכום',
+        reasoning: 'הנמקה',
+        roleplay: 'משחק תפקידים',
+        instructions: 'ביצוע הוראות',
+        code: 'יצירת קוד',
+        math: 'פיתרון מתמטיקה',
+        multilingual: 'רב לשוני',
+        rewriting: 'שכתוב',
+        creativity: 'כתיבה יצירתית',
       },
     },
     completionParams: {
       grammar:
-        'Enforce specific grammar rules to ensure the generated text follows a particular structure or format',
-      stop: 'Define specific phrases that will stop text generation',
-      n_predict: 'Set how long the generated response should be (in tokens)',
-      n_probs: 'Show probability scores for alternative words.',
+        'אכיפת כללי דקדוק ספציפיים כדי להבטיח שהטקסט שנוצר יעקוב אחר מבנה או פורמט מסוימים',
+      stop: 'הגדירו ביטויים ספציפיים שיעצרו את יצירת הטקסט',
+      n_predict: 'הגדר את אורך התגובה שתיווצר (באסימונים)',
+      n_probs: 'הצג ציוני הסתברות עבור מילים חלופיות.',
       top_k:
-        'Control creativity by limiting word choices to the K most likely options. Lower values make responses more focused',
+        'שלטו ביצירתיות על ידי הגבלת בחירת המילים ל-K האפשרויות הסבירות ביותר. ערכים נמוכים יותר הופכים את התשובות לממוקדות יותר.',
       top_p:
-        'Balance creativity and coherence. Higher values (near 1.0) allow more creative but potentially less focused responses',
+        'איזון בין יצירתיות לקוהרנטיות. ערכים גבוהים יותר (בקרבת 1.0) מאפשרים תגובות יצירתיות יותר אך פוטנציאלית פחות ממוקדות.',
       min_p:
-        'The minimum probability for a token to be considered. Filter out unlikely words to reduce nonsensical or out-of-context responses',
+        'ההסתברות המינימלית לכך שאסימון יילקח בחשבון. סנן מילים לא סבירות כדי להפחית תגובות חסרות משמעות או תגובות שאינן קשורות להקשר.',
       temperature:
-        'Control creativity vs predictability. Higher values make responses more creative but less focused',
+        'שליטה ביצירתיות לעומת יכולת חיזוי. ערכים גבוהים יותר הופכים תגובות ליצירתיות יותר אך פחות ממוקדות.',
       penalty_last_n:
-        'How far back to check for repetition. Larger values help prevent long-term repetition',
+        'כמה אחורה לבדוק חזרה. ערכים גדולים יותר עוזרים למנוע חזרה לטווח ארוך.',
       penalty_repeat:
-        'Discourage word repetition. Higher values make responses use more diverse language',
+        'הימנעות מחזרה על מילים. ערכים גבוהים יותר גורמים לתשובות להשתמש בשפה מגוונת יותר.',
       penalty_freq:
-        'Penalize overused words. Higher values encourage using a broader vocabulary',
+        'יש להעניש מילים שנעשה בהן שימוש יתר. ערכים גבוהים יותר מעודדים שימוש באוצר מילים רחב יותר.',
       penalty_present:
-        'Reduce repetition of themes and ideas. Higher values encourage more diverse content',
+        'צימצום חזרה על נושאים ורעיונות. ערכים גבוהים יותר מעודדים תוכן מגוון יותר',
       mirostat:
-        'Enable advanced control over response creativity. Set to 1 or 2 (smoother) for smart, real-time adjustments to randomness and coherence.',
+        'אפשר שליטה מתקדמת על יצירתיות התגובה. הגדר ל-1 או 2 (חלק יותר) להתאמות חכמות בזמן אמת לאקראיות ולקוהרנטיות.',
       mirostat_tau:
-        'Set the target creativity level for Mirostat. Higher values allow for more diverse and imaginative responses, while lower values ensure more focused outputs.',
+        'הגדירו את רמת היצירתיות היעד עבור Mirostat. ערכים גבוהים יותר מאפשרים תגובות מגוונות ודמיוניות יותר, בעוד שערכים נמוכים יותר מבטיחים תפוקות ממוקדות יותר.',
       mirostat_eta:
-        'How quickly Mirostat adjusts creativity. Higher values mean faster adjustments',
+        'כמה מהר מירוסטט מתאים את היצירתיות. ערכים גבוהים יותר משמעותם התאמות מהירות יותר',
       dry_multiplier:
-        "Strength of the DRY (Don't Repeat Yourself) feature. Higher values strongly prevent repetition",
+        "עוצמת התכונה DRY (אל תחזרו על עצמכם). ערכים גבוהים יותר מונעים חזרות באופן משמעותי.",
       dry_base:
         'Base penalty for repetition in DRY mode. Higher values are more aggressive at preventing repetition',
       dry_allowed_length:
@@ -2679,14 +2679,14 @@ export const l10n = {
         'Enable locally typical sampling with parameter p. 1.0 is disabled',
     },
     about: {
-      screenTitle: 'App Info',
+      screenTitle: 'מידע',
       description:
         'An app that brings language models directly to your phone. Sits on the shoulders of llama.cpp and llama.rn.',
       supportProject: 'Support the Project',
       supportProjectDescription:
-        'If you enjoy using PocketPal AI, please consider supporting the project by:',
-      githubButton: 'Star on GitHub',
-      orText: 'or',
+        'אם אתם נהנים להשתמש בבינה מלאכותית של PocketPal, אנא שקלו לתמוך בפרויקט על ידי:',
+      githubButton: 'דרג ב-GitHub',
+      orText: 'או',
       orBy: 'or by',
       sponsorButton: 'Become a Sponsor',
       versionCopiedTitle: 'Version copied',
