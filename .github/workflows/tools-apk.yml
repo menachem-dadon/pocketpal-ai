@@ -53,6 +53,7 @@ jobs:
         run: |
           corepack enable
           yarn install --frozen-lockfile
+      - uses: android-actions/setup-android@v3
       - name: Install Android SDK packages
         run: sdkmanager 'platforms;android-37' 'build-tools;37.0.0' 'ndk;27.3.13750724' 'cmake;3.22.1'
       - name: Build standalone APK

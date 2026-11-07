@@ -110,7 +110,7 @@ const ChatGenerationSettingsSheetImpl = ({
           : chatSessionStore.newChatCompletionSettings,
       );
     }
-  }, [session, isVisible, chatSessionStore.newChatCompletionSettings]);
+  }, [session, isVisible]);
 
   const updateSettings = (name: string, value: any) => {
     setSettings(prev => ({...prev, [name]: value}));
