@@ -10,7 +10,6 @@ import {
   chatSessionStore,
   modelStore,
   NEW_SESSION_TITLE,
-  palStore,
   serverStore,
   ttsStore,
   uiStore,
@@ -804,15 +803,7 @@ export const useChatSession = (
       runUi.holdAwake();
     }
 
-    const activeSession = chatSessionStore.sessions.find(
-      s => s.id === chatSessionStore.activeSessionId,
-    );
-    const pal = activeSession?.activePalId
-      ? palStore.pals.find(p => p.id === activeSession.activePalId)
-      : null;
-
     const systemMessages = resolveSystemMessages({
-      pal,
       model: modelStore.activeModel,
     });
 
@@ -831,10 +822,6 @@ export const useChatSession = (
 
     currentMessageInfo.current = messageInfo;
     opts.onTurnCreated?.(messageInfo.id);
-
-    // Allowed talent names for this Pal. The runner rejects any
-    // tool call whose function.name isn't in this list.
-    const palTalents = (pal?.pact?.talents ?? []).map(t => t.name);
 
     const completionStartTime = Date.now();
     const timeToFirstTokenMs: {value: number | null} = {value: null};
@@ -890,7 +877,7 @@ export const useChatSession = (
       const events = runAgent({
         engine,
         initialParams: cleanCompletionParams as ApiCompletionParams,
-        allowedTalentNames: palTalents,
+        allowedTalentNames: tools.map(tool => tool.function.name),
         talentLookup: name => talentRegistry.get(name),
         triggerMarkers,
         messageId: messageInfo.id,

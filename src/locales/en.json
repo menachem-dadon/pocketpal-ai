@@ -129,7 +129,7 @@
     "importError": "Failed to import chat sessions. Please check the file format.",
     "internetSearch": {
       "title": "Internet Search",
-      "description": "Let Pals search the web with their own tools. Bring your own API key — PocketPal never holds your keys or routes your queries.",
+      "description": "Let your chats search the web with global tools. Bring your own API key — PocketPal never holds your keys or routes your queries.",
       "providerLabel": "Search provider",
       "providerGated": "Coming soon",
       "keyLabel": "API key",
@@ -811,6 +811,7 @@
     },
     "chatPalModelPickerSheet": {
       "modelsTab": "Models",
+      "selectModel": "Select model",
       "palsTab": "Pals",
       "noPal": "No Pal",
       "disablePal": "Disable active pal",
@@ -1123,6 +1124,11 @@
       "importError": "Failed to import pals. Please check the file format."
     }
   },
+  "toolsScreen": {
+    "description": "Choose the tools available in every chat. Changes apply to new and existing conversations on the next message.",
+    "searchHint": "Web search and website reading require a configured search provider and your consent. Some models may not support tools.",
+    "searchSettings": "Configure web search"
+  },
   "palsScreen": {
     "sectionTitles": {
       "myPalsLocal": "My Pals (local)",
@@ -1294,6 +1300,7 @@
   "screenTitles": {
     "chat": "Chat",
     "models": "Models",
+    "tools": "Tools",
     "pals": "Pals (experimental)",
     "benchmark": "Benchmark",
     "settings": "Settings",

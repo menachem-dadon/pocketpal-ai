@@ -10,7 +10,7 @@ import {Alert, Linking} from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import {deepLinkService, DeepLinkParams} from '../services/DeepLinkService';
 import {isHubLink, parseHubRunURL} from '../services/hubRunLink';
-import {chatSessionStore, palStore, deepLinkStore, uiStore} from '../store';
+import {deepLinkStore, uiStore} from '../store';
 import {ROUTES} from '../utils/navigationConstants';
 import {
   isBenchmarkRunnerUrl,
@@ -26,30 +26,12 @@ export const useDeepLinking = () => {
   const navigation = useNavigation();
 
   const handleChatDeepLink = useCallback(
-    async (palId: string, palName?: string, message?: string) => {
+    async (_palId: string, _palName?: string, message?: string) => {
       try {
-        // Find the pal
-        const pal = palStore.pals.find(p => p.id === palId);
-
-        if (!pal) {
-          console.error(`Pal not found: ${palId} (${palName})`);
-
-          // Show user-friendly error message
-          Alert.alert(
-            'Pal Not Found',
-            `The pal "${palName || palId}" could not be found. It may have been deleted or is not available on this device.`,
-            [{text: 'OK'}],
-          );
-          return;
-        }
-
         // Store message to prefill if provided
         if (message) {
           deepLinkStore.setPendingMessage(message);
         }
-
-        // Set the pal as active
-        await chatSessionStore.setActivePal(pal.id);
 
         // Navigate to chat screen with proper typing
         (navigation as any).navigate(ROUTES.CHAT);

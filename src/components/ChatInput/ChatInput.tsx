@@ -603,7 +603,9 @@ export const ChatInput = observer(
                       },
                     ]}
                     onPress={onPalBtnPress}
-                    accessibilityLabel="Select Pal"
+                    accessibilityLabel={
+                      l10n.components.chatPalModelPickerSheet.selectModel
+                    }
                     accessibilityRole="button">
                     <Animated.View
                       style={{

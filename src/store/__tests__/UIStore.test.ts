@@ -6,6 +6,27 @@ jest.mock('react-native/Libraries/Utilities/Appearance', () => ({
 }));
 
 describe('UIStore', () => {
+  it('starts with only the three requested global tools enabled', () => {
+    expect(new UIStore().enabledTools).toEqual([
+      'web_search',
+      'read_url',
+      'datetime',
+    ]);
+  });
+
+  it('supports disabling all tools and repeated enabling without duplicates', () => {
+    const store = new UIStore();
+    store.setToolEnabled('calculate', true);
+    store.setToolEnabled('calculate', true);
+    expect(
+      store.enabledTools.filter(name => name === 'calculate'),
+    ).toHaveLength(1);
+    for (const name of [...store.enabledTools]) {
+      store.setToolEnabled(name, false);
+    }
+    expect(store.enabledTools).toEqual([]);
+  });
+
   beforeEach(() => {
     uiStore.setColorScheme('light');
     uiStore.setAutoNavigateToChat(true);

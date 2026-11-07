@@ -15,22 +15,18 @@ import {
   VoiceSetupSheet,
   VoiceTeaser,
 } from '../../components';
-import {PalSheet} from '../../components/PalsSheets';
 
 import {useChatSession, useVoiceMode} from '../../hooks';
 import {usePendingMessage} from '../../hooks/useDeepLinking';
-import {Pal} from '../../types/pal';
 
 import {
   modelStore,
   chatSessionStore,
-  palStore,
   serverStore,
   ttsStore,
   uiStore,
   voiceModeStore,
 } from '../../store';
-import {hasVideoCapability} from '../../utils/pal-capabilities';
 
 import {L10nContext} from '../../utils';
 import {
@@ -40,8 +36,6 @@ import {
 import {MessageType} from '../../utils/types';
 import {ErrorState} from '../../utils/errors';
 import {user, assistant} from '../../utils/chat';
-
-import {VideoPalScreen} from './VideoPalScreen';
 
 const renderBubble = ({
   child,
@@ -70,15 +64,6 @@ export const ChatScreen: React.FC = observer(() => {
   } | null>(null);
   const l10n = React.useContext(L10nContext);
 
-  const activePalId = chatSessionStore.activePalId;
-  const activePal = activePalId
-    ? palStore.pals.find(p => p.id === activePalId)
-    : undefined;
-  const isVideoPal = activePal && hasVideoCapability(activePal);
-
-  // State for pal sheet
-  const [isPalSheetVisible, setIsPalSheetVisible] = useState(false);
-
   // State for model error report sheet
   const [isErrorReportVisible, setIsErrorReportVisible] = useState(false);
   const [errorToReport, setErrorToReport] = useState<ErrorState | null>(null);
@@ -101,11 +86,6 @@ export const ChatScreen: React.FC = observer(() => {
     },
   });
   const {tapCloud, toggleMute, end, dismissSheet} = voiceMode;
-  React.useEffect(() => {
-    if (isVideoPal) {
-      end();
-    }
-  }, [isVideoPal, end]);
   const voiceControls = useMemo(
     () => ({tapCloud, toggleMute, end}),
     [tapCloud, toggleMute, end],
@@ -125,15 +105,6 @@ export const ChatScreen: React.FC = observer(() => {
 
   // Handle deep linking for message prefill
   const {pendingMessage, clearPendingMessage} = usePendingMessage();
-
-  // Callback handler for opening pal sheet
-  const handleOpenPalSheet = React.useCallback((_pal: Pal) => {
-    setIsPalSheetVisible(true);
-  }, []);
-
-  const handleClosePalSheet = React.useCallback(() => {
-    setIsPalSheetVisible(false);
-  }, []);
 
   // Handlers for model error report
   const handleReportModelError = React.useCallback(() => {
@@ -191,18 +162,14 @@ export const ChatScreen: React.FC = observer(() => {
     chatSessionStore.newChatCompletionSettings,
     chatSessionStore.newChatThinkingOverride,
     chatSessionStore.newChatReasoningEffort,
-    activePalId,
   ]);
 
-  // Tool-compatibility one-time banner: when the active Pal declares
-  // tools but the loaded model's jinja metadata signals no tool support
+  // Tool-compatibility one-time banner: when global tools are enabled
+  // but the loaded model's jinja metadata signals no tool support
   // in any of its slots (see below), surface an inline warning.
   // Persisted per model id so the warning fires at most once.
   React.useEffect(() => {
-    const palDeclaresTools =
-      activePal?.pact?.talents !== undefined &&
-      activePal.pact.talents.length > 0;
-    if (!palDeclaresTools) {
+    if (uiStore.enabledTools.length === 0) {
       return;
     }
     const model = (modelStore.context as any)?.model;
@@ -237,7 +204,11 @@ export const ChatScreen: React.FC = observer(() => {
     });
     uiStore.markToolCompatWarned(modelId);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activePalId, modelStore.activeModelId, modelStore.context]);
+  }, [
+    uiStore.enabledTools.length,
+    modelStore.activeModelId,
+    modelStore.context,
+  ]);
 
   // Persist the on/off intent (and optional effort) onto both the local
   // enable_thinking flag and the reasoning carrier so the remote wire path
@@ -297,11 +268,6 @@ export const ChatScreen: React.FC = observer(() => {
     await persistReasoning(nextEnabled, nextEffort);
   };
 
-  // If the active pal is a video pal, show the video pal screen
-  if (isVideoPal) {
-    return <VideoPalScreen activePal={activePal} />;
-  }
-
   const teaserOpen = voiceMode.sheet?.kind === 'teaser';
   const chatCovered = voiceModeStore.isFullViewOpen || teaserOpen;
 
@@ -315,10 +281,8 @@ export const ChatScreen: React.FC = observer(() => {
         <ChatView
           renderBubble={renderBubble}
           messages={chatSessionStore.currentSessionMessages}
-          activePal={activePal}
           onSendPress={handleSendPress}
           onStopPress={handleStopPress}
-          onPalSettingsSelect={handleOpenPalSheet}
           user={user}
           isStopVisible={modelStore.inferencing}
           isStreaming={modelStore.isStreaming}
@@ -385,13 +349,6 @@ export const ChatScreen: React.FC = observer(() => {
         onClose={handleCloseErrorReport}
         error={errorToReport}
       />
-      {activePal && (
-        <PalSheet
-          isVisible={isPalSheetVisible}
-          onClose={handleClosePalSheet}
-          pal={activePal}
-        />
-      )}
     </VoiceModeControlsContext.Provider>
   );
 });

@@ -57,7 +57,7 @@
             <action android:name="android.intent.action.VIEW" />
             <category android:name="android.intent.category.DEFAULT" />
             <category android:name="android.intent.category.BROWSABLE" />
-            <data android:scheme="pocketpal" android:host="hub" />
+            <data android:scheme="pocketpaltools" android:host="hub" />
         </intent-filter>
       </activity>
 

@@ -1515,13 +1515,13 @@ describe('chatSessionStore', () => {
       chatSessionStore.sessions = [session];
       chatSessionStore.activeSessionId = 'session1';
 
-      expect(chatSessionStore.activePalId).toBe('pal1');
+      expect(chatSessionStore.activePalId).toBeUndefined();
     });
 
     it('gets active pal ID from newChatPalId when no active session', () => {
       chatSessionStore.newChatPalId = 'pal2';
 
-      expect(chatSessionStore.activePalId).toBe('pal2');
+      expect(chatSessionStore.activePalId).toBeUndefined();
     });
 
     it('sets active pal ID for active session', async () => {

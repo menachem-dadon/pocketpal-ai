@@ -33,7 +33,6 @@ import {ROUTES} from './src/utils/navigationConstants';
 import {
   SidebarContent,
   ModelsHeaderRight,
-  PalHeaderRight,
   HeaderLeft,
   AppWithMigration,
   TTSSetupSheet,
@@ -60,8 +59,7 @@ import {
   // Dev tools screen. Only available in debug mode.
   DevToolsScreen,
 } from './src/screens';
-import PalsScreen from './src/screens/PalsScreen';
-import {OnboardingStack} from './src/screens/OnboardingScreens';
+import {ToolsScreen} from './src/screens/ToolsScreen/ToolsScreen';
 
 // Check if app is in debug mode
 const isDebugMode = __DEV__;
@@ -81,21 +79,12 @@ const DeepLinkHandler = () => {
   return null;
 };
 
-// Branches between the OnboardingStack (first-launch flow) and the main
-// Drawer.Navigator. Both children mount under the same provider tree —
-// switching does NOT remount providers above this point.
-//
-// The hydration check is belt-and-suspenders. AppWithMigrationWrapper
-// already gates render on `isHydrated(uiStore)`, but reading the same
-// observable here keeps the contract local and survives refactors of the
-// outer gate.
+// This edition starts directly in chat; the Pal onboarding is inactive.
+// Wait for persisted global tool choices before mounting chat.
 type SwitchPointProps = {drawer: React.ReactNode};
 const SwitchPoint: React.FC<SwitchPointProps> = observer(({drawer}) => {
   if (!isHydrated(uiStore)) {
     return null;
-  }
-  if (!uiStore.hasCompletedOnboarding) {
-    return <OnboardingStack />;
   }
   return <>{drawer}</>;
 });
@@ -167,12 +156,11 @@ const App = observer(() => {
                               }}
                             />
                             <Drawer.Screen
-                              name={ROUTES.PALS}
-                              component={gestureHandlerRootHOC(PalsScreen)}
+                              name={ROUTES.TOOLS}
+                              component={gestureHandlerRootHOC(ToolsScreen)}
                               options={{
-                                headerRight: () => <PalHeaderRight />,
                                 headerStyle: styles.headerWithoutDivider,
-                                title: currentL10n.screenTitles.pals,
+                                title: currentL10n.screenTitles.tools,
                               }}
                             />
                             <Drawer.Screen

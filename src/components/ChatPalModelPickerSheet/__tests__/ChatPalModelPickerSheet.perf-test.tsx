@@ -36,12 +36,12 @@ describe('ChatPalModelPickerSheet render performance', () => {
           const closedBackdrops = backdropCount(screen);
           expect(screen.queryByText('Models')).toBeNull();
 
-          fireEvent.press(screen.getByLabelText('Select Pal'));
+          fireEvent.press(screen.getByLabelText('Select model'));
           await flushTimers();
           expect(screen.getByText('Models')).toBeTruthy();
           expect(backdropCount(screen)).toBe(closedBackdrops + 1);
 
-          fireEvent.press(screen.getByLabelText('Select Pal'));
+          fireEvent.press(screen.getByLabelText('Select model'));
           await flushTimers();
           expect(screen.queryByText('Models')).toBeNull();
           expect(backdropCount(screen)).toBe(closedBackdrops);

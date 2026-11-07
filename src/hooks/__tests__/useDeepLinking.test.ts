@@ -308,7 +308,7 @@ describe('useDeepLinking — deep-link routing', () => {
     jest.spyOn(Linking, 'getInitialURL').mockResolvedValue(null);
   });
 
-  it('routes the chat host link to the Pal', async () => {
+  it('opens chat from a legacy Pal link without activating its Pal', async () => {
     (palStore as any).pals = [{id: 'p1'}];
     renderHook(() => useDeepLinking());
     await getHandler()({
@@ -317,6 +317,7 @@ describe('useDeepLinking — deep-link routing', () => {
       host: 'chat',
       queryParams: {palId: 'p1'},
     });
-    expect(chatSessionStore.setActivePal).toHaveBeenCalledWith('p1');
+    expect(chatSessionStore.setActivePal).not.toHaveBeenCalled();
+    expect(mockNavigate).toHaveBeenCalledWith(ROUTES.CHAT);
   });
 });

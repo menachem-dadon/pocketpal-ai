@@ -1,0 +1,67 @@
+name: PocketPal Tools APK
+
+on:
+  push:
+    branches: [codex/global-tools]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: tools-apk-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22.21.0'
+          cache: yarn
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Install dependencies
+        run: |
+          corepack enable
+          yarn install --frozen-lockfile
+      - name: Check lint, types, and tests
+        run: |
+          yarn lint
+          yarn typecheck
+          yarn test --runInBand
+
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22.21.0'
+          cache: yarn
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Install dependencies
+        run: |
+          corepack enable
+          yarn install --frozen-lockfile
+      - name: Install Android SDK packages
+        run: sdkmanager 'platforms;android-37' 'build-tools;37.0.0' 'ndk;27.3.13750724' 'cmake;3.22.1'
+      - name: Build standalone APK
+        working-directory: android
+        run: |
+          chmod +x gradlew
+          ./gradlew assembleProdRelease --no-daemon --max-workers=2 -PreactNativeArchitectures=arm64-v8a,x86_64
+      - uses: actions/upload-artifact@v4
+        with:
+          name: pocketpal-tools-apk
+          path: android/app/build/outputs/apk/prod/release/*.apk
+          if-no-files-found: error

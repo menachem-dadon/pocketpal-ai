@@ -9,11 +9,33 @@ export class UIStore {
   } as const;
 }
 
+const enabledTools = observable.box<string[]>([
+  'web_search',
+  'read_url',
+  'datetime',
+]);
+
 const colorScheme = observable.box<'light' | 'dark'>('light');
 const setColorScheme = (value: 'light' | 'dark') =>
   runInAction(() => colorScheme.set(value));
 
 export const mockUiStore = {
+  get enabledTools() {
+    return enabledTools.get();
+  },
+  set enabledTools(value: string[]) {
+    runInAction(() => enabledTools.set(value));
+  },
+  setToolEnabled: jest.fn((name: string, enabled: boolean) =>
+    runInAction(() => {
+      const current = enabledTools.get();
+      enabledTools.set(
+        enabled
+          ? [...new Set([...current, name])]
+          : current.filter(tool => tool !== name),
+      );
+    }),
+  ),
   get colorScheme() {
     return colorScheme.get();
   },

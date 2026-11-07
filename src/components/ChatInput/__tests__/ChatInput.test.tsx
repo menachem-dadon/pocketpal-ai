@@ -373,7 +373,7 @@ describe('input', () => {
       </UserContext.Provider>,
     );
 
-    const palButton = getByLabelText('Select Pal');
+    const palButton = getByLabelText('Select model');
     fireEvent.press(palButton);
     expect(onPalBtnPress).toHaveBeenCalledTimes(1);
   });

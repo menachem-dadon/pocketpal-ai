@@ -48,6 +48,15 @@ export class UIStore {
 
   displayMemUsage = false;
 
+  // Shared by every chat. New tools remain opt-in unless listed here.
+  enabledTools: string[] = ['web_search', 'read_url', 'datetime'];
+
+  setToolEnabled(name: string, enabled: boolean) {
+    this.enabledTools = enabled
+      ? [...new Set([...this.enabledTools, name])]
+      : this.enabledTools.filter(tool => tool !== name);
+  }
+
   iOSBackgroundDownloading = true;
 
   benchmarkShareDialog = {
@@ -117,6 +126,7 @@ export class UIStore {
         'colorScheme',
         'autoNavigatetoChat',
         'displayMemUsage',
+        'enabledTools',
         'benchmarkShareDialog',
         '_language',
         'toolCompatWarnedModels',

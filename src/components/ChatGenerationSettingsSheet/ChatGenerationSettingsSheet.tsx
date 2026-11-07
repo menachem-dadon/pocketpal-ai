@@ -6,7 +6,6 @@ import {
   chatSessionStore,
   defaultCompletionSettings,
   modelStore,
-  palStore,
 } from '../../store';
 import {styles} from './styles';
 import {
@@ -14,7 +13,7 @@ import {
   validateCompletionSettings,
 } from '../../utils/modelSettings';
 import {Alert, View} from 'react-native';
-import {Button, SegmentedButtons, Text} from 'react-native-paper';
+import {Button} from 'react-native-paper';
 import {L10nContext} from '../../utils';
 import {ChevronDownIcon} from '../../assets/icons';
 import {Menu} from '../Menu';
@@ -100,80 +99,18 @@ const ChatGenerationSettingsSheetImpl = ({
     defaultCompletionSettings,
   );
   const [resetMenuVisible, setResetMenuVisible] = useState(false);
-  // Only use local state for sessions with active pal, otherwise derive from session
-  const [localSettingsSource, setLocalSettingsSource] = useState<
-    'pal' | 'custom' | null
-  >(null);
-
   const isEditingPresetSettings = !session;
 
-  // For existing sessions, use session's activePalId
-  // For new chat sessions, use newChatPalId
-  const effectivePalId = session?.activePalId || chatSessionStore.newChatPalId;
-  const activePal = effectivePalId
-    ? palStore.pals.find(p => p.id === effectivePalId)
-    : undefined;
-
-  // Determine the actual settings source to use
-  // For existing sessions with pal: use session's settingsSource or local override
-  // For new chat sessions with pal: use stored newChatSettingsSource
-  const effectiveSettingsSource = activePal
-    ? session
-      ? (localSettingsSource ?? session?.settingsSource ?? 'pal')
-      : (localSettingsSource ?? chatSessionStore.newChatSettingsSource) // New chat session uses stored choice
-    : null;
-
-  const isUsingPalSettings = effectiveSettingsSource === 'pal';
-  const showSettingsToggle = !!activePal; // Show toggle whenever there's an active pal
-
-  // Reset and sync local state when session changes
+  // Load the current chat settings.
   useEffect(() => {
-    if (activePal) {
-      if (session) {
-        // Existing session with pal - use session's settingsSource
-        setLocalSettingsSource(session.settingsSource || 'pal');
-      } else {
-        // New chat session with pal - use stored newChatSettingsSource
-        setLocalSettingsSource(chatSessionStore.newChatSettingsSource);
-      }
-    } else {
-      // No pal - clear local state
-      setLocalSettingsSource(null);
-    }
-  }, [
-    session,
-    activePal,
-    effectivePalId, // This includes both session pal and newChatPalId
-  ]);
-
-  // Load appropriate settings based on source
-  useEffect(() => {
-    const loadSettings = async () => {
-      if (isUsingPalSettings && effectivePalId) {
-        const resolved = await chatSessionStore.resolveCompletionSettings(
-          session?.id, // Can be undefined for new sessions
-          effectivePalId,
-        );
-        setSettings(resolved);
-      } else {
-        const customSettings =
-          session?.completionSettings ??
-          chatSessionStore.newChatCompletionSettings;
-        setSettings(customSettings);
-      }
-    };
-
-    // Only load settings when the sheet is visible
     if (isVisible) {
-      loadSettings();
+      setSettings(
+        session && session.settingsSource !== 'pal'
+          ? session.completionSettings
+          : chatSessionStore.newChatCompletionSettings,
+      );
     }
-  }, [
-    session,
-    effectiveSettingsSource,
-    isUsingPalSettings,
-    isVisible,
-    effectivePalId,
-  ]);
+  }, [session, isVisible, chatSessionStore.newChatCompletionSettings]);
 
   const updateSettings = (name: string, value: any) => {
     setSettings(prev => ({...prev, [name]: value}));
@@ -246,12 +183,9 @@ const ChatGenerationSettingsSheetImpl = ({
     }
 
     if (session) {
-      // Only save if using custom settings (pal settings are read-only)
-      if (!isUsingPalSettings) {
-        await chatSessionStore.updateSessionCompletionSettings(
-          processedSettings.settings,
-        );
-      }
+      await chatSessionStore.updateSessionCompletionSettings(
+        processedSettings.settings,
+      );
     } else {
       await chatSessionStore.setNewChatCompletionSettings(
         processedSettings.settings,
@@ -297,60 +231,9 @@ const ChatGenerationSettingsSheetImpl = ({
       isVisible={isVisible}
       onClose={onCloseSheet}>
       <Sheet.ScrollView contentContainerStyle={styles.scrollviewContainer}>
-        {/* Settings Source Toggle */}
-        {showSettingsToggle && (
-          <View style={styles.settingsSourceContainer}>
-            <Text variant="labelMedium" style={styles.settingsSourceTitle}>
-              {l10n.components.chatGenerationSettingsSheet.settingsSource}
-            </Text>
-            <SegmentedButtons
-              value={effectiveSettingsSource || 'pal'}
-              onValueChange={async value => {
-                const newSource = value as 'pal' | 'custom';
-                setLocalSettingsSource(newSource);
-
-                if (session) {
-                  // Existing session - update session settings source
-                  await chatSessionStore.updateSessionSettingsSource(newSource);
-                } else {
-                  // New chat session - store the choice for when session is created
-                  chatSessionStore.setNewChatSettingsSource(newSource);
-                }
-
-                // Immediately reload settings for the new source
-                if (newSource === 'pal' && effectivePalId) {
-                  const resolved =
-                    await chatSessionStore.resolveCompletionSettings(
-                      session?.id, // Can be undefined for new sessions
-                      effectivePalId,
-                    );
-                  setSettings(resolved);
-                } else {
-                  setSettings(
-                    session?.completionSettings ??
-                      chatSessionStore.newChatCompletionSettings,
-                  );
-                }
-              }}
-              buttons={[
-                {
-                  value: 'pal',
-                  label: `Pal (${activePal.name})`,
-                },
-                {
-                  value: 'custom',
-                  label: 'Custom',
-                },
-              ]}
-              density="medium"
-            />
-          </View>
-        )}
-
         <CompletionSettings
           settings={settings}
           onChange={updateSettings}
-          disabled={isUsingPalSettings}
           serverDefaults={
             isEditingPresetSettings
               ? undefined

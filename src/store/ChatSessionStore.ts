@@ -16,7 +16,7 @@ import {
 import {chatSessionRepository} from '../repositories/ChatSessionRepository';
 import {defaultCompletionParams} from '../utils/completionSettingsVersions';
 import {derivedText} from '../utils/chat';
-import {palStore} from './PalStore';
+import {uiStore} from './UIStore';
 import {deriveToolSchemas} from '../services/talents';
 import {AgentUiState, initialAgentUiState} from '../services/agent';
 
@@ -1334,11 +1334,9 @@ class ChatSessionStore {
   }
 
   get activePalId(): string | undefined {
-    if (this.activeSessionId) {
-      const session = this.sessions.find(s => s.id === this.activeSessionId);
-      return session?.activePalId;
-    }
-    return this.newChatPalId;
+    // Legacy Pal metadata remains readable for import/export compatibility.
+    // Pals are inactive in this edition, including in imported conversations.
+    return undefined;
   }
 
   // Selection mode computed properties
@@ -1504,11 +1502,12 @@ class ChatSessionStore {
 
   /**
    * Resolves completion settings according to the precedence hierarchy:
-   * System Defaults → Global User Settings → Pal-Specific Settings → Session-Specific Settings (only if explicitly modified)
+   * System Defaults → Global User Settings → Custom Session Settings.
+   * Tool availability always comes from the global selection.
    */
   async resolveCompletionSettings(
     sessionId?: string,
-    palId?: string,
+    _palId?: string,
   ): Promise<CompletionParams> {
     // Start with system defaults
     let resolvedSettings: CompletionParams = {...defaultCompletionSettings};
@@ -1519,34 +1518,8 @@ class ChatSessionStore {
       ...this.newChatCompletionSettings,
     };
 
-    // Apply pal-specific settings if available
-    if (palId) {
-      // Use in-memory pal store as the source of truth (avoids cache invalidation issues)
-      const pal = palStore.pals.find(p => p.id === palId);
-      const palSettings = pal?.completionSettings;
-
-      if (palSettings) {
-        resolvedSettings = {
-          ...resolvedSettings,
-          ...palSettings,
-        };
-      }
-
-      // Inject tool schemas from pact.talents (PACT → completionSettings.tools)
-      const talentNames = pal?.pact?.talents?.map(t => t.name);
-      if (talentNames && talentNames.length > 0) {
-        const tools = deriveToolSchemas(talentNames);
-        if (tools.length > 0) {
-          resolvedSettings = {
-            ...resolvedSettings,
-            tools,
-          };
-        }
-      }
-    }
-
-    // No-session-only: apply user's explicit thinking override last so it
-    // wins over pal's enable_thinking. Overlays the local enable_thinking flag
+    // No-session-only: apply the user's explicit thinking override last.
+    // Overlays the local enable_thinking flag
     // AND the reasoning carrier (so the remote wire path honors the on/off
     // intent for the first message of the new chat, not just local thinking).
     // Does NOT touch any other field, and does NOT affect tool availability.
@@ -1567,33 +1540,23 @@ class ChatSessionStore {
       const session = this.sessions.find(s => s.id === sessionId);
 
       if (session?.settingsSource === 'custom') {
-        // User explicitly chose custom settings - use session settings.
-        // Preserve PACT-derived tools — custom settings control generation
-        // params (temperature, etc.) but pact.talents is the source of truth
-        // for tool availability.
-        const pactTools = resolvedSettings.tools;
-        resolvedSettings = session.completionSettings;
-        if (pactTools) {
-          resolvedSettings = {...resolvedSettings, tools: pactTools};
-        }
+        resolvedSettings = {...session.completionSettings};
       }
     }
 
-    return resolvedSettings;
+    // Replace even an empty selection so saved session/global schemas cannot
+    // re-enable a tool the user has switched off.
+    const tools = deriveToolSchemas(uiStore.enabledTools);
+    delete resolvedSettings.tools;
+    delete resolvedSettings.tool_choice;
+    return tools.length > 0 ? {...resolvedSettings, tools} : resolvedSettings;
   }
 
   /**
    * Gets the effective completion settings for the current context
    */
   async getCurrentCompletionSettings(): Promise<CompletionParams> {
-    const activePalId = this.activeSessionId
-      ? this.sessions.find(s => s.id === this.activeSessionId)?.activePalId
-      : this.newChatPalId;
-
-    return this.resolveCompletionSettings(
-      this.activeSessionId || undefined,
-      activePalId,
-    );
+    return this.resolveCompletionSettings(this.activeSessionId || undefined);
   }
 }
 

@@ -253,7 +253,6 @@ export const ChatView = observer(
     onMessageLongPress: externalOnMessageLongPress,
     onMessagePress,
     activePal,
-    onPalSettingsSelect,
     onPreviewDataFetched,
     onSendPress,
     onStopPress,
@@ -296,7 +295,6 @@ export const ChatView = observer(
     const [_selectedModel, setSelectedModel] = React.useState<string | null>(
       null,
     );
-    const [_selectedPal, setSelectedPal] = React.useState<string | undefined>();
 
     // Image viewer state
     const [isImageViewVisible, setIsImageViewVisible] = React.useState(false);
@@ -1151,11 +1149,6 @@ export const ChatView = observer(
       setIsPickerVisible(false);
     }, []);
 
-    const handlePalSelect = React.useCallback((pal: string | undefined) => {
-      setSelectedPal(pal);
-      setIsPickerVisible(false);
-    }, []);
-
     // ============ COMPUTED VALUES ============
     const inputBackgroundColor = activePal?.color?.[1]
       ? activePal.color?.[1]
@@ -1293,8 +1286,6 @@ export const ChatView = observer(
                 isVisible={isPickerVisible}
                 onClose={() => setIsPickerVisible(false)}
                 onModelSelect={handleModelSelect}
-                onPalSelect={handlePalSelect}
-                onPalSettingsSelect={onPalSettingsSelect}
                 chatInputHeight={chatInputHeight.height}
               />
             )}
