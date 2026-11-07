@@ -30,11 +30,12 @@ jobs:
         run: |
           corepack enable
           yarn install --frozen-lockfile
-      - name: Check lint, types, and tests
-        run: |
-          yarn lint
-          yarn typecheck
-          yarn test --runInBand
+      - name: Check lint
+        run: yarn lint
+      - name: Check types
+        run: yarn typecheck
+      - name: Run tests
+        run: yarn test --runInBand --silent
 
   build:
     runs-on: ubuntu-latest
@@ -55,10 +56,16 @@ jobs:
           yarn install --frozen-lockfile
       - uses: android-actions/setup-android@v3
         with:
+          cmdline-tools-version: '16111833'
           packages: platform-tools
           log-accepted-android-sdk-licenses: false
       - name: Install Android SDK packages
-        run: sdkmanager 'platforms;android-37' 'build-tools;37.0.0' 'ndk;27.3.13750724' 'cmake;3.22.1'
+        run: |
+          sdkmanager 'platforms;android-37.0' 'build-tools;37.0.0' 'ndk;27.3.13750724' 'cmake;3.22.1'
+          # The app uses integer compileSdk 37; current SDK packages use 37.0.
+          if [ ! -e "$ANDROID_HOME/platforms/android-37" ]; then
+            ln -s "$ANDROID_HOME/platforms/android-37.0" "$ANDROID_HOME/platforms/android-37"
+          fi
       - name: Build standalone APK
         working-directory: android
         run: |

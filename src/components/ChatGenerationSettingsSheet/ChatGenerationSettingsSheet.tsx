@@ -104,11 +104,13 @@ const ChatGenerationSettingsSheetImpl = ({
   // Load the current chat settings.
   useEffect(() => {
     if (isVisible) {
-      setSettings(
-        session && session.settingsSource !== 'pal'
+      setSettings({
+        ...defaultCompletionSettings,
+        ...chatSessionStore.newChatCompletionSettings,
+        ...(session && session.settingsSource !== 'pal'
           ? session.completionSettings
-          : chatSessionStore.newChatCompletionSettings,
-      );
+          : {}),
+      });
     }
   }, [session, isVisible]);
 

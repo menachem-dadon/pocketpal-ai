@@ -22,6 +22,17 @@ const mockAssistant = {id: 'h3o3lc5xj'};
 beforeEach(() => {
   jest.clearAllMocks();
 
+  // These integration scenarios enable calculation and date/time globally.
+  (
+    chatSessionStore.getCurrentCompletionSettings as jest.Mock
+  ).mockResolvedValue({
+    ...chatSessionStore.newChatCompletionSettings,
+    tools: ['calculate', 'datetime'].map(name => ({
+      type: 'function',
+      function: {name, description: 'Integration test tool', parameters: {}},
+    })),
+  });
+
   palStore.pals = [] as any;
   chatSessionStore.sessions = sessionFixtures as any;
   chatSessionStore.activeSessionId = 'session-1';

@@ -146,7 +146,7 @@ async function executeOne(
 
   if (!fnName || !allowedTalentNames.includes(fnName)) {
     const summary = fnName
-      ? `Talent "${fnName}" is not enabled for this Pal`
+      ? `Tool "${fnName}" is not enabled`
       : NO_FUNCTION_NAME;
     const result: TalentResult = {
       type: 'error',

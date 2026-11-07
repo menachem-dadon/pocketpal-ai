@@ -26,6 +26,7 @@ const EXPECTED_SECTIONS = [
   'feedback',
   'components',
   'palsScreen',
+  'toolsScreen',
   'validation',
   'camera',
   'video',

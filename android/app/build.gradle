@@ -97,6 +97,8 @@ android {
     namespace "com.pocketpal"
     defaultConfig {
         applicationId toolsApplicationId
+        // react-native-config must find BuildConfig in the Java namespace.
+        resValue "string", "build_config_package", "com.pocketpal"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 160
@@ -160,7 +162,7 @@ android {
         releaseE2e {
             // E2E buildType: inherits 95% of release (Hermes, minify toggle,
             // proguard rules), then overrides:
-            //   1. debuggable=true so `adb shell run-as com.pocketpalai.e2e`
+            //   1. debuggable=true so `adb shell run-as com.menachem.pocketpal.tools.e2e`
             //      works for the benchmark-matrix preseed workflow.
             //   2. Debug signing — E2E builds are never shipped to stores.
             //   3. matchingFallbacks so dependencies resolve to their release

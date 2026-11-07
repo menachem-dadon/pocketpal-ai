@@ -705,7 +705,7 @@ describe('chatSessionStore', () => {
       expect(chatSessionRepository.createSession).toHaveBeenCalledWith(
         expect.any(String),
         [mockMessage],
-        originalSession.completionSettings,
+        expect.objectContaining(originalSession.completionSettings),
         undefined,
         'pal',
       );
@@ -1502,7 +1502,7 @@ describe('chatSessionStore', () => {
   });
 
   describe('pal management', () => {
-    it('gets active pal ID from active session', () => {
+    it('ignores a legacy active Pal ID in an existing session', () => {
       const session = {
         id: 'session1',
         title: 'Session 1',
@@ -1518,7 +1518,7 @@ describe('chatSessionStore', () => {
       expect(chatSessionStore.activePalId).toBeUndefined();
     });
 
-    it('gets active pal ID from newChatPalId when no active session', () => {
+    it('ignores a legacy active Pal ID in a new chat', () => {
       chatSessionStore.newChatPalId = 'pal2';
 
       expect(chatSessionStore.activePalId).toBeUndefined();
@@ -1547,7 +1547,7 @@ describe('chatSessionStore', () => {
       expect(chatSessionStore.newChatPalId).toBe('pal2');
     });
 
-    it('preserves active pal ID when resetting active session', () => {
+    it('clears the active Pal when resetting an existing session', () => {
       const session = {
         id: 'session1',
         title: 'Session 1',
@@ -1562,7 +1562,7 @@ describe('chatSessionStore', () => {
 
       chatSessionStore.resetActiveSession();
 
-      expect(chatSessionStore.newChatPalId).toBe('pal1');
+      expect(chatSessionStore.newChatPalId).toBeUndefined();
       expect(chatSessionStore.activeSessionId).toBeNull();
     });
 

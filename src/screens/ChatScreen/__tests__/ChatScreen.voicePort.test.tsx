@@ -70,7 +70,7 @@ describe('ChatScreen voice turn port', () => {
     expect(mockStop).toHaveBeenCalledTimes(1);
   });
 
-  it('ends voice mode when a video Pal takes over the chat', () => {
+  it('keeps voice mode available when legacy video Pal metadata exists', () => {
     const activePal = Object.getOwnPropertyDescriptor(
       chatSessionStore,
       'activePalId',
@@ -81,7 +81,7 @@ describe('ChatScreen voice turn port', () => {
 
     renderScreen();
 
-    expect(mockEnd).toHaveBeenCalled();
+    expect(mockEnd).not.toHaveBeenCalled();
     activePal.mockReturnValue(null);
     palStore.pals = pals;
   });

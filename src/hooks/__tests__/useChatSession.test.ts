@@ -770,7 +770,7 @@ describe('useChatSession', () => {
     },
   );
 
-  it('should render parametrized system prompt when pal has parameters', async () => {
+  it('ignores a legacy parametrized Pal system prompt', async () => {
     // Create a mock pal with parametrized system prompt
     const mockPal = {
       id: 'test-pal-id',
@@ -834,12 +834,12 @@ describe('useChatSession', () => {
       await result.current.handleSendPress(textMessage);
     });
 
-    // Check that a system message was included with the rendered template
-    expect(capturedMessages.some(msg => msg.role === 'system')).toBe(true);
-    const systemMessage = capturedMessages.find(msg => msg.role === 'system');
-    expect(systemMessage.content).toBe(
-      'You are Gandalf, a wizard in Middle-earth.',
-    );
+    expect(
+      capturedMessages.some(
+        msg => msg.role === 'system' && msg.content?.includes('Gandalf'),
+      ),
+    ).toBe(false);
+    expect(capturedMessages.some(msg => msg.role === 'user')).toBe(true);
   });
 
   it('emits multimodal warning when user sends an image but multimodal is disabled', async () => {
@@ -916,7 +916,7 @@ describe('useChatSession', () => {
     });
   });
 
-  it('should use system prompt as-is when pal has no parameters', async () => {
+  it('ignores a legacy Pal system prompt without parameters', async () => {
     // Create a mock pal without parameters
     const mockPal = {
       id: 'test-pal-id-no-params',
@@ -967,10 +967,14 @@ describe('useChatSession', () => {
       await result.current.handleSendPress(textMessage);
     });
 
-    // Check that a system message was included with the original prompt
-    expect(capturedMessages.some(msg => msg.role === 'system')).toBe(true);
-    const systemMessage = capturedMessages.find(msg => msg.role === 'system');
-    expect(systemMessage.content).toBe('You are a helpful assistant.');
+    expect(
+      capturedMessages.some(
+        msg =>
+          msg.role === 'system' &&
+          msg.content?.includes('You are a helpful assistant.'),
+      ),
+    ).toBe(false);
+    expect(capturedMessages.some(msg => msg.role === 'user')).toBe(true);
   });
 
   describe('search grounding', () => {
@@ -1039,7 +1043,7 @@ describe('useChatSession', () => {
 
     // Strict templates reject a second system message ("must be at the
     // beginning"), so grounding folds into the pal's system message.
-    it('sends exactly one system message carrying both the pal prompt and the grounding', async () => {
+    it('uses global search grounding while ignoring a legacy Pal prompt', async () => {
       const pal = useSessionWithPal('You are a research assistant.');
       await activateSearchTools();
       const captured = captureMessages();
@@ -1052,7 +1056,7 @@ describe('useChatSession', () => {
       expect(systemMessages).toHaveLength(1);
 
       const today = new Date().toISOString().slice(0, 10);
-      expect(systemMessages[0].content).toContain(
+      expect(systemMessages[0].content).not.toContain(
         'You are a research assistant.',
       );
       expect(systemMessages[0].content).toContain(`Today's date is ${today}`);
@@ -1079,7 +1083,7 @@ describe('useChatSession', () => {
       expect(systemMessages[0].content).toContain('web_search');
     });
 
-    it('leaves the pal system message alone when no search tools are active', async () => {
+    it('ignores the legacy Pal prompt when no search tools are active', async () => {
       useSessionWithPal('You are a research assistant.');
       const captured = captureMessages();
 
@@ -1088,8 +1092,7 @@ describe('useChatSession', () => {
       const systemMessages = captured.messages.filter(
         msg => msg.role === 'system',
       );
-      expect(systemMessages).toHaveLength(1);
-      expect(systemMessages[0].content).toBe('You are a research assistant.');
+      expect(systemMessages).toHaveLength(0);
     });
 
     it('seeds the read_url allowlist from URLs the user wrote', async () => {
