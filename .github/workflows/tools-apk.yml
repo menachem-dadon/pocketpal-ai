@@ -36,8 +36,13 @@ jobs:
   build:
     runs-on: ubuntu-latest
     timeout-minutes: 60
+    env:
+      ORG_GRADLE_PROJECT_rnllamaBuildFromSource: 'true'
+      RNLLAMA_SKIP_POSTINSTALL: '1'
     steps:
       - uses: actions/checkout@v4
+      - name: Make room for native build tools
+        run: sudo rm -rf /usr/share/dotnet /opt/ghc
       - uses: actions/setup-node@v4
         with:
           node-version: '22.21.0'
@@ -62,13 +67,29 @@ jobs:
           if [ ! -e "$ANDROID_HOME/platforms/android-37" ]; then
             ln -s "$ANDROID_HOME/platforms/android-37.0" "$ANDROID_HOME/platforms/android-37"
           fi
+      - name: Select the native variants required by the payload manifest
+        run: |
+          VARIANTS=$(node scripts/verify-android-payload.js --print-variants)
+          echo "ORG_GRADLE_PROJECT_rnllamaVariants=$VARIANTS" >> "$GITHUB_ENV"
+      - name: Set up the Hexagon SDK
+        uses: ./.github/actions/setup-hexagon-sdk
       - name: Build standalone APK
         working-directory: android
         run: |
+          set -euo pipefail
           chmod +x gradlew
-          ./gradlew assembleProdRelease --no-daemon --max-workers=2 -PreactNativeArchitectures=arm64-v8a,x86_64
+          ./gradlew assembleProdRelease --no-daemon --max-workers=2 -PreactNativeArchitectures=arm64-v8a,x86_64 2>&1 | tee android-build.log
+      - name: Verify native build variants and payload
+        run: |
+          VARIANTS=$(node scripts/verify-android-payload.js --print-variants)
+          grep -qF "Building rnllama variants: $VARIANTS" android/android-build.log
+          node scripts/verify-android-payload.js --apk android/app/build/outputs/apk/prod/release/app-prod-release.apk --report payload-report.txt
       - uses: actions/upload-artifact@v4
         with:
           name: pocketpal-tools-apk
           path: android/app/build/outputs/apk/prod/release/*.apk
           if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        with:
+          name: pocketpal-tools-payload-report
+          path: payload-report.txt
