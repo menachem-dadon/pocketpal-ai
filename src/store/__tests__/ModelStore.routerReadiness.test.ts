@@ -6,6 +6,15 @@ import {streamChatCompletion} from '../../api/openai';
 import type {ServerType} from '../../utils/serverTypes';
 import {RemoteModelRequestWithdrawnError} from '../../utils/errors';
 
+// Router readiness does not exercise preset discovery. Keep its startup
+// probes deterministic so no background fetch outlives this test suite.
+jest.mock('../../services/deviceRules/rules', () => ({
+  fetchRules: jest.fn().mockResolvedValue(null),
+}));
+jest.mock('../../services/deviceRules/signals', () => ({
+  readDeviceSignals: jest.fn().mockResolvedValue({ramBytes: 8 * 1e9}),
+}));
+
 jest.mock('../ServerStore', () => ({
   serverStore: {
     getApiKey: jest.fn().mockResolvedValue(undefined),
