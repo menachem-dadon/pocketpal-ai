@@ -96,9 +96,6 @@ jest.mock('@gorhom/bottom-sheet', () => {
   };
 });
 
-// Mock Alert
-jest.spyOn(Alert, 'alert');
-
 // Mock Keyboard
 const mockKeyboardDismiss = jest.fn();
 const mockKeyboardRemove = jest.fn();
