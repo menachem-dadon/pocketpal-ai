@@ -13,6 +13,7 @@ const NATIVE_INPUTS = [
   'android/gradle.properties',
   'android/gradle/wrapper/gradle-wrapper.properties',
   'scripts/android-payload-manifest.json',
+  'scripts/postinstall.sh',
   '.github/actions/setup-hexagon-sdk',
 ];
 const CERTIFICATE =
@@ -31,6 +32,8 @@ function nativeFingerprint(ref) {
   if (!tree.includes('yarn.lock')) {
     throw new Error('Missing native dependency inputs');
   }
+  const packageConfig = JSON.parse(run('git', ['show', `${ref}:package.json`]));
+  delete packageConfig.version;
   // Bump this contract if compiler flags, ABIs or build tools change outside
   // the tracked native inputs. App/UI and version changes keep the same key.
   return createHash('sha256')
@@ -38,6 +41,7 @@ function nativeFingerprint(ref) {
       'tools-native-v1/ubuntu24/ndk27.3.13750724/cmake3.22.1/arm64+x86_64\n',
     )
     .update(tree)
+    .update(JSON.stringify(packageConfig))
     .digest('hex');
 }
 
