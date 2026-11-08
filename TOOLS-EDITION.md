@@ -25,8 +25,49 @@ Firebase benchmark/feedback submission needs a new `google-services.json` with
 a client for this application ID. The upstream Firebase identity is not reused.
 Local chat and tools do not need Firebase.
 
-Run `yarn lint`, `yarn typecheck`, and `yarn test --runInBand` before packaging.
-The **PocketPal Tools APK** workflow builds a standalone arm64/x86_64 APK after
-these checks. Workflow artifacts use the repository's development signing
-fallback; published release APKs are signed separately with the edition's local
-release key. Keep that private key to install future updates over this edition.
+## Publishing an update
+
+The **PocketPal Tools release** workflow handles verification, Android building,
+signing and publication without an active agent or a local APK download.
+
+1. Complete the app changes on the feature branch. Update `package.json`,
+   `.version` and Android `versionName` together, and increase Android
+   `versionCode` above every published Tools version.
+2. Commit and push. Create an annotated tag matching the version, for example
+   `v1.22.1-tools.2`, on that exact commit and push the tag. A normal branch push
+   does not start a Tools APK build.
+3. Check the workflow's **preflight** job. After it succeeds and verification
+   starts, hand off the run link and end the chat. Follow the run to completion
+   only if the user explicitly requests continued monitoring.
+
+The release pipeline requires lint, TypeScript and unit tests to pass before
+the Android build. It verifies native libraries and DSP assets, signs the APK,
+checks the fixed Tools certificate fingerprint, package ID and version, then
+creates and publishes the release. A failed job prevents publication. The
+existing tag is required, and published versions are never overwritten.
+
+Signing credentials live in the `pocketpal-tools-release` GitHub environment:
+`TOOLS_KEYSTORE_BASE64`, `TOOLS_STORE_PASSWORD`, `TOOLS_KEY_PASSWORD` and
+`TOOLS_KEY_ALIAS`. Only the signing/publication job receives them. Environment
+rules allow Tools release and validation tags. Keep the local private-key
+backup; updates must retain the same signing identity. Temporary runner key
+files are removed after signing. Intermediate artifacts expire after seven days.
+
+For unchanged native dependencies, patches and build inputs, the workflow
+verifies and reuses inference cores from a matching published Tools APK. JNI
+wrappers and the app are rebuilt. Changed native inputs select a full source
+build with the pinned Hexagon SDK. Gradle and CMake caches also help reruns;
+their availability depends on GitHub's cache scope and retention. There is no
+dependency on an upstream workflow artifact or a fixed historical commit.
+
+## Checking the release automation
+
+Push a unique annotated tag such as `tools-ci-check-20261108-1`. This runs a
+short validation using the latest published Tools APK, verifies the native
+payload, signs with the environment key and uploads a **draft** validation
+release. It does not compile the app or run device tests, and does not publish
+an application update. The draft's metadata identifies the original APK source
+and the workflow commit separately. The optional manual `source_release` input
+can select another published Tools APK; manual runs must also select a tag.
+
+The normal release path still runs all code checks and builds the new source.

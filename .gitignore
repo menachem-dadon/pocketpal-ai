@@ -107,6 +107,7 @@ e2e/specs/visual-capture/TASK-*.spec.ts
 # gradle command line, so it is never committed.
 android/android-build.log
 /payload-report.txt
+/release-info.json
 
 # Dev-team workflow control-plane artefacts (story docs, designer asks,
 # screenshot inventories). Live in the dev-team repo and are sometimes

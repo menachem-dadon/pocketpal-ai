@@ -1,26 +1,58 @@
-name: PocketPal Tools APK
+name: PocketPal Tools release
 
 on:
   push:
-    branches: [codex/global-tools]
-    paths:
-      - App.tsx
-      - index.js
-      - src/**
-      - android/**
-      - patches/**
-      - scripts/**
-      - package.json
-      - yarn.lock
+    tags: ['v*-tools.*', 'tools-ci-check-*']
   workflow_dispatch:
+    inputs:
+      source_release:
+        description: Existing Tools release for validation tags (blank selects latest)
+        required: false
 
 permissions:
   contents: read
 
+concurrency:
+  group: pocketpal-tools-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  RNLLAMA_SKIP_POSTINSTALL: '1'
+
 jobs:
+  preflight:
+    runs-on: ubuntu-24.04
+    outputs:
+      mode: ${{ steps.check.outputs.mode }}
+      version: ${{ steps.check.outputs.version }}
+      version_code: ${{ steps.check.outputs.version_code }}
+      source_release: ${{ steps.check.outputs.source_release }}
+      native_release: ${{ steps.check.outputs.native_release }}
+      native_key: ${{ steps.check.outputs.native_key }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22.21.0'
+      - name: Check tag, versions and reusable native sources
+        id: check
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TOOLS_SOURCE_RELEASE: ${{ inputs.source_release }}
+        run: node scripts/tools-release.js
+      - uses: actions/upload-artifact@v4
+        with:
+          name: tools-release-info
+          path: release-info.json
+          retention-days: 7
+
   verify:
-    runs-on: ubuntu-latest
-    timeout-minutes: 60
+    needs: preflight
+    if: needs.preflight.outputs.mode == 'release'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -31,74 +63,198 @@ jobs:
         with:
           distribution: temurin
           java-version: '17'
-      - name: Install dependencies
-        run: |
-          corepack enable
-          yarn install --frozen-lockfile
-      - name: Check lint
-        run: yarn lint
-      - name: Check types
-        run: yarn typecheck
-      - name: Run tests
-        run: yarn test --runInBand --silent
+      - run: corepack enable && yarn install --frozen-lockfile
+      - run: yarn lint
+      - run: yarn typecheck
+      - run: yarn test --runInBand --silent
 
   build:
-    runs-on: ubuntu-latest
+    needs: [preflight, verify]
+    if: ${{ !cancelled() && needs.preflight.result == 'success' && (needs.verify.result == 'success' || needs.preflight.outputs.mode == 'validate') }}
+    runs-on: ubuntu-24.04
     timeout-minutes: 180
     env:
-      ORG_GRADLE_PROJECT_rnllamaBuildFromSource: 'true'
-      RNLLAMA_SKIP_POSTINSTALL: '1'
+      GH_TOKEN: ${{ github.token }}
+      MODE: ${{ needs.preflight.outputs.mode }}
+      SOURCE_RELEASE: ${{ needs.preflight.outputs.source_release }}
+      NATIVE_RELEASE: ${{ needs.preflight.outputs.native_release }}
     steps:
       - uses: actions/checkout@v4
-      - name: Make room for native build tools
-        run: sudo rm -rf /usr/share/dotnet /opt/ghc
       - uses: actions/setup-node@v4
         with:
           node-version: '22.21.0'
-          cache: yarn
+          cache: ${{ needs.preflight.outputs.mode == 'release' && 'yarn' || '' }}
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: '17'
-      - name: Install dependencies
+      - name: Download the existing APK for a signing/publication validation
+        if: env.MODE == 'validate'
         run: |
-          corepack enable
-          yarn install --frozen-lockfile
+          mkdir -p output
+          gh release download "$SOURCE_RELEASE" --repo "$GITHUB_REPOSITORY" --pattern '*.apk' --output output/app.apk
+      - name: Prepare native dependencies
+        if: env.MODE == 'release'
+        run: corepack enable && yarn install --frozen-lockfile
+      - name: Reuse matching native cores from a published Tools APK
+        if: env.MODE == 'release' && env.NATIVE_RELEASE != ''
+        run: |
+          mkdir -p native-reference
+          gh release download "$NATIVE_RELEASE" --repo "$GITHUB_REPOSITORY" --pattern '*.apk' --output native-reference/app.apk
+          node scripts/verify-android-payload.js --apk native-reference/app.apk --report native-reference/report.txt
+          python3 - <<'PY'
+          import pathlib, zipfile
+          target = pathlib.Path('node_modules/llama.rn/android/src/main/jniLibs')
+          with zipfile.ZipFile('native-reference/app.apk') as archive:
+              for entry in archive.namelist():
+                  parts = pathlib.PurePosixPath(entry).parts
+                  if len(parts) != 3 or parts[0] != 'lib' or parts[1] not in ('arm64-v8a', 'x86_64'):
+                      continue
+                  if not (parts[2].startswith('librnllama') and 'jni' not in parts[2]):
+                      continue
+                  output = target / parts[1] / parts[2]
+                  output.parent.mkdir(parents=True, exist_ok=True)
+                  output.write_bytes(archive.read(entry))
+          PY
+          echo 'ORG_GRADLE_PROJECT_rnllamaBuildFromSource=false' >> "$GITHUB_ENV"
+      - name: Select a fresh native build when inputs changed
+        if: env.MODE == 'release' && env.NATIVE_RELEASE == ''
+        run: echo 'ORG_GRADLE_PROJECT_rnllamaBuildFromSource=true' >> "$GITHUB_ENV"
+      - name: Select native variants
+        if: env.MODE == 'release'
+        run: echo "ORG_GRADLE_PROJECT_rnllamaVariants=$(node scripts/verify-android-payload.js --print-variants)" >> "$GITHUB_ENV"
+      - uses: gradle/actions/setup-gradle@v6.4.1
+        if: env.MODE == 'release'
+        with:
+          cache-read-only: false
+      - uses: actions/cache@v4
+        if: env.MODE == 'release'
+        with:
+          path: node_modules/llama.rn/android/.cxx
+          key: tools-cxx-v1-${{ runner.os }}-${{ needs.preflight.outputs.native_key }}-${{ needs.preflight.outputs.native_release == '' && 'source' || 'prebuilt' }}
       - uses: android-actions/setup-android@v3
+        if: env.MODE == 'release'
         with:
           cmdline-tools-version: '16111833'
           packages: platform-tools
           log-accepted-android-sdk-licenses: false
       - name: Install Android SDK packages
+        if: env.MODE == 'release'
         run: |
           sdkmanager 'platforms;android-37.0' 'build-tools;37.0.0' 'ndk;27.3.13750724' 'cmake;3.22.1'
-          # The app uses integer compileSdk 37; current SDK packages use 37.0.
           if [ ! -e "$ANDROID_HOME/platforms/android-37" ]; then
             ln -s "$ANDROID_HOME/platforms/android-37.0" "$ANDROID_HOME/platforms/android-37"
           fi
-      - name: Select the native variants required by the payload manifest
-        run: |
-          VARIANTS=$(node scripts/verify-android-payload.js --print-variants)
-          echo "ORG_GRADLE_PROJECT_rnllamaVariants=$VARIANTS" >> "$GITHUB_ENV"
-      - name: Set up the Hexagon SDK
+      - name: Make space for the native compiler
+        if: env.MODE == 'release' && env.NATIVE_RELEASE == ''
+        run: sudo rm -rf /usr/share/dotnet /opt/ghc
+      - name: Set up the Hexagon SDK for a fresh native core
+        if: env.MODE == 'release' && env.NATIVE_RELEASE == ''
         uses: ./.github/actions/setup-hexagon-sdk
-      - name: Build standalone APK
+      - name: Build the application
+        if: env.MODE == 'release'
         working-directory: android
         run: |
-          set -euo pipefail
           chmod +x gradlew
-          ./gradlew assembleProdRelease --no-daemon --max-workers=2 -PreactNativeArchitectures=arm64-v8a,x86_64 2>&1 | tee android-build.log
-      - name: Verify native build variants and payload
-        run: |
-          VARIANTS=$(node scripts/verify-android-payload.js --print-variants)
-          grep -qF "Building rnllama variants: $VARIANTS" android/android-build.log
-          node scripts/verify-android-payload.js --apk android/app/build/outputs/apk/prod/release/app-prod-release.apk --report payload-report.txt
+          ./gradlew assembleProdRelease --no-daemon --max-workers=4 -PreactNativeArchitectures=arm64-v8a,x86_64
+          mkdir -p ../output
+          cp app/build/outputs/apk/prod/release/app-prod-release.apk ../output/app.apk
+      - name: Verify the complete native payload
+        run: node scripts/verify-android-payload.js --apk output/app.apk --report output/payload-report.txt
       - uses: actions/upload-artifact@v4
         with:
-          name: pocketpal-tools-apk
-          path: android/app/build/outputs/apk/prod/release/*.apk
+          name: tools-build
+          path: output/
+          retention-days: 7
           if-no-files-found: error
-      - uses: actions/upload-artifact@v4
+
+  publish:
+    needs: [preflight, build]
+    if: ${{ !cancelled() && needs.preflight.result == 'success' && needs.build.result == 'success' }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    environment: pocketpal-tools-release
+    permissions:
+      contents: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+      MODE: ${{ needs.preflight.outputs.mode }}
+      VERSION: ${{ needs.preflight.outputs.version }}
+    steps:
+      - uses: actions/download-artifact@v4
         with:
-          name: pocketpal-tools-payload-report
-          path: payload-report.txt
+          name: tools-build
+          path: output
+      - uses: actions/download-artifact@v4
+        with:
+          name: tools-release-info
+          path: output
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v3
+        with:
+          cmdline-tools-version: '16111833'
+          packages: build-tools;37.0.0
+          log-accepted-android-sdk-licenses: false
+      - name: Sign with the existing Tools release key
+        env:
+          TOOLS_KEYSTORE_BASE64: ${{ secrets.TOOLS_KEYSTORE_BASE64 }}
+          TOOLS_STORE_PASSWORD: ${{ secrets.TOOLS_STORE_PASSWORD }}
+          TOOLS_KEY_PASSWORD: ${{ secrets.TOOLS_KEY_PASSWORD }}
+          TOOLS_KEY_ALIAS: ${{ secrets.TOOLS_KEY_ALIAS }}
+        run: |
+          set -euo pipefail
+          umask 077
+          KEYSTORE="$RUNNER_TEMP/pocketpal-tools.keystore"
+          trap 'rm -f "$KEYSTORE"' EXIT
+          test -n "$TOOLS_KEYSTORE_BASE64" && test -n "$TOOLS_STORE_PASSWORD" && test -n "$TOOLS_KEY_ALIAS"
+          printf '%s' "$TOOLS_KEYSTORE_BASE64" | base64 --decode > "$KEYSTORE"
+          APK="output/PocketPal-Tools-$VERSION.apk"
+          "$ANDROID_HOME/build-tools/37.0.0/apksigner" sign --ks "$KEYSTORE" --ks-key-alias "$TOOLS_KEY_ALIAS" --ks-pass env:TOOLS_STORE_PASSWORD --key-pass env:TOOLS_KEY_PASSWORD --v4-signing-enabled false --out "$APK" output/app.apk
+          "$ANDROID_HOME/build-tools/37.0.0/apksigner" verify --verbose --print-certs "$APK" > output/signature-report.txt
+          "$ANDROID_HOME/build-tools/37.0.0/aapt" dump badging "$APK" > "$RUNNER_TEMP/tools-badging.txt"
+          export APK
+          python3 - <<'PY'
+          import json, os, pathlib, re
+          info = json.loads(pathlib.Path('output/release-info.json').read_text())
+          signature = pathlib.Path('output/signature-report.txt').read_text()
+          badging = (pathlib.Path(os.environ['RUNNER_TEMP']) / 'tools-badging.txt').read_text()
+          cert = re.search(r'Signer #1 certificate SHA-256 digest: ([0-9a-f]+)', signature)
+          package = re.search(r"package: name='([^']+)' versionCode='(\d+)' versionName='([^']+)'", badging)
+          if not cert or cert[1] != info['signingCertificateSha256']:
+              raise SystemExit('Release signing certificate mismatch')
+          if not package or (package[1], int(package[2]), package[3]) != (info['packageId'], info['versionCode'], info['version']):
+              raise SystemExit('Release APK identity/version mismatch')
+          print('Release signature, package identity and version verified')
+          PY
+          (cd output && sha256sum "PocketPal-Tools-$VERSION.apk" > SHA256SUMS.txt)
+      - name: Publish the release, or create a validation draft
+        run: |
+          set -euo pipefail
+          if [ "$MODE" = validate ]; then
+            TITLE="CI validation — $GITHUB_REF_NAME"
+            printf 'Validation draft for signing and automatic publication. Uses an existing APK; this is not an application update.\n\nWorkflow commit: %s\nRun: %s/%s/actions/runs/%s\n' "$GITHUB_SHA" "$GITHUB_SERVER_URL" "$GITHUB_REPOSITORY" "$GITHUB_RUN_ID" > output/notes.md
+          else
+            TITLE="PocketPal Tools $VERSION"
+            printf 'Signed PocketPal Tools APK. Installs alongside the original app.\n\nCode checks, native payload, signing certificate and APK identity verified.\nSource: %s\nRun: %s/%s/actions/runs/%s\n' "$GITHUB_SHA" "$GITHUB_SERVER_URL" "$GITHUB_REPOSITORY" "$GITHUB_RUN_ID" > output/notes.md
+          fi
+          if EXISTING_STATE=$(gh release view "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY" --json isDraft --jq .isDraft 2>/dev/null); then
+            test "$EXISTING_STATE" = true || { echo 'A published release will not be overwritten'; exit 1; }
+            gh release upload "$GITHUB_REF_NAME" "output/PocketPal-Tools-$VERSION.apk" output/SHA256SUMS.txt output/payload-report.txt output/signature-report.txt output/release-info.json --repo "$GITHUB_REPOSITORY" --clobber
+            gh release edit "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY" --title "$TITLE" --notes-file output/notes.md
+          else
+            gh release create "$GITHUB_REF_NAME" "output/PocketPal-Tools-$VERSION.apk" output/SHA256SUMS.txt output/payload-report.txt output/signature-report.txt output/release-info.json --repo "$GITHUB_REPOSITORY" --verify-tag --draft --title "$TITLE" --notes-file output/notes.md
+          fi
+          if [ "$MODE" = release ]; then
+            gh release edit "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY" --draft=false --latest
+          fi
+          RELEASE_URL=$(gh release view "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY" --json url --jq .url)
+          printf '### PocketPal Tools\n\nMode: %s\n\n[Release or validation draft](%s)\n' "$MODE" "$RELEASE_URL" >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: tools-signature-report
+          path: output/signature-report.txt
+          retention-days: 7
