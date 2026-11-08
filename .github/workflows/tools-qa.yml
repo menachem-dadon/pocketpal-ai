@@ -1,15 +1,6 @@
 name: PocketPal Tools Android QA
 
 on:
-  push:
-    branches: [codex/global-tools]
-    paths:
-      - .github/workflows/tools-qa.yml
-      - e2e/specs/features/global-tools.spec.ts
-      - e2e/wdio.android.local.conf.ts
-      - e2e/helpers/selectors.ts
-      - e2e/pages/ChatPage.ts
-      - e2e/pages/DrawerPage.ts
   workflow_dispatch:
     inputs:
       build_run:
