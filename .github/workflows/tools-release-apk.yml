@@ -1,6 +1,9 @@
 name: PocketPal Tools release APK
 
 on:
+  push:
+    branches: [codex/global-tools]
+    paths: [.github/workflows/tools-release-apk.yml]
   workflow_dispatch:
 
 permissions:
