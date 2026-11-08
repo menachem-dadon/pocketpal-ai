@@ -26,19 +26,19 @@ export class DrawerPage extends BasePage {
   }
 
   /**
-   * Check if drawer is open (by checking if Pals tab is visible)
-   * We use Pals because it's unique to the drawer and not a screen title
+   * Check if drawer is open (by checking if Tools is visible)
+   * We use Tools because it's unique to the drawer and not a screen title
    */
   async isOpen(): Promise<boolean> {
-    return this.isElementDisplayed(Selectors.drawer.palsTab, 3000);
+    return this.isElementDisplayed(Selectors.drawer.toolsTab, 3000);
   }
 
   /**
    * Wait for drawer to be fully open
-   * We use Pals tab because it's unique to the drawer (not a screen title)
+   * We use Tools because it's unique to the drawer (not a screen title)
    */
   async waitForOpen(timeout = 10000): Promise<void> {
-    await this.waitForElement(Selectors.drawer.palsTab, timeout);
+    await this.waitForElement(Selectors.drawer.toolsTab, timeout);
   }
 
   /**
@@ -46,7 +46,7 @@ export class DrawerPage extends BasePage {
    * We use Pals tab because it's unique to the drawer and won't appear elsewhere
    */
   async waitForClose(timeout = 5000): Promise<void> {
-    await this.waitForElementToDisappear(Selectors.drawer.palsTab, timeout);
+    await this.waitForElementToDisappear(Selectors.drawer.toolsTab, timeout);
   }
 
   /**
@@ -84,7 +84,7 @@ export class DrawerPage extends BasePage {
   /**
    * Navigate to Pals screen
    *
-   * Tap the visible label, not Selectors.drawer.palsTab. That selector is the
+   * Tap the visible label, not Selectors.drawer.toolsTab. That selector is the
    * testID (drawer-item-pals) used as the open/close indicator so it survives a
    * language switch, but a Paper Drawer.Item does not reliably respond to a
    * testID tap on iOS (see the selectors.ts drawer comment) — tapping the label

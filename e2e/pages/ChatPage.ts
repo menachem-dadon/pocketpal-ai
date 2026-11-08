@@ -58,16 +58,16 @@ export class ChatPage extends BasePage {
    *
    * The single tap is occasionally missed on Android (the drawer never opens),
    * which then fails the downstream waitForOpen. Tap, verify the drawer
-   * actually opened (the Pals item appears), and retry the tap if it didn't —
+   * actually opened (the Tools item appears), and retry the tap if it didn't —
    * checking "already open" first so a retry can't toggle an open drawer shut.
    */
   async openDrawer(): Promise<void> {
     for (let attempt = 0; attempt < 3; attempt++) {
-      if (await this.isElementDisplayed(Selectors.drawer.palsTab, 1000)) {
+      if (await this.isElementDisplayed(Selectors.drawer.toolsTab, 1000)) {
         return;
       }
       await this.tap(Selectors.chat.menuButton);
-      if (await this.isElementDisplayed(Selectors.drawer.palsTab, 5000)) {
+      if (await this.isElementDisplayed(Selectors.drawer.toolsTab, 5000)) {
         return;
       }
     }
@@ -207,10 +207,7 @@ export class ChatPage extends BasePage {
       // Clamp the tap inside the toggle bounds. The chip-avoidance offset above
       // can otherwise compute an x just past an edge, so the tap misses the
       // button and the toggle never flips.
-      x = Math.min(
-        loc.x + size.width - 4,
-        Math.max(loc.x + 4, x),
-      );
+      x = Math.min(loc.x + size.width - 4, Math.max(loc.x + 4, x));
       await browser
         .action('pointer', {parameters: {pointerType: 'touch'}})
         .move({x, y})
@@ -327,7 +324,7 @@ export class ChatPage extends BasePage {
    * Open the pal/model picker sheet by tapping the pal selector button.
    */
   async openPalPicker(): Promise<void> {
-    const palBtn = browser.$(byAccessibilityLabel('Select Pal'));
+    const palBtn = browser.$(byAccessibilityLabel('Select model'));
     await palBtn.waitForDisplayed({timeout: 5000});
     await palBtn.click();
     await browser.pause(500);

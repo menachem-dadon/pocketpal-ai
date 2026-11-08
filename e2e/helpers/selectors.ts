@@ -149,6 +149,9 @@ export const Selectors = {
   // behind the drawer (a model card's "Settings" gear), whose tap lands on
   // whichever drawer row covers it.
   drawer: {
+    get toolsTab(): string {
+      return byTestId('drawer-item-tools');
+    },
     get chatTab(): string {
       return drawerItem('chat', 'Chat');
     },

@@ -3,6 +3,15 @@ name: PocketPal Tools APK
 on:
   push:
     branches: [codex/global-tools]
+    paths:
+      - App.tsx
+      - index.js
+      - src/**
+      - android/**
+      - patches/**
+      - scripts/**
+      - package.json
+      - yarn.lock
   workflow_dispatch:
 
 permissions:
