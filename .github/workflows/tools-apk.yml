@@ -221,9 +221,9 @@ jobs:
           info = json.loads(pathlib.Path('output/release-info.json').read_text())
           signature = pathlib.Path('output/signature-report.txt').read_text()
           badging = (pathlib.Path(os.environ['RUNNER_TEMP']) / 'tools-badging.txt').read_text()
-          cert = re.search(r'Signer #1 certificate SHA-256 digest: ([0-9a-f]+)', signature)
+          certificates = {value.lower() for value in re.findall(r'certificate SHA-256 digest: ([0-9a-fA-F]{64})', signature)}
           package = re.search(r"package: name='([^']+)' versionCode='(\d+)' versionName='([^']+)'", badging)
-          if not cert or cert[1] != info['signingCertificateSha256']:
+          if certificates != {info['signingCertificateSha256']}:
               raise SystemExit('Release signing certificate mismatch')
           if not package or (package[1], int(package[2]), package[3]) != (info['packageId'], info['versionCode'], info['version']):
               raise SystemExit('Release APK identity/version mismatch')
