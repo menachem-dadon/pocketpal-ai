@@ -42,6 +42,19 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           TOOLS_SOURCE_RELEASE: ${{ inputs.source_release }}
         run: node scripts/tools-release.js
+      - name: Download and verify the pinned Gradle distribution
+        if: steps.check.outputs.mode == 'release'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: bash scripts/prepare-tools-gradle.sh "$RUNNER_TEMP/tools-gradle"
+      - uses: actions/upload-artifact@v4
+        if: steps.check.outputs.mode == 'release'
+        with:
+          name: tools-gradle-distribution
+          path: ${{ runner.temp }}/tools-gradle/*.zip
+          compression-level: 0
+          retention-days: 7
+          if-no-files-found: error
       - uses: actions/upload-artifact@v4
         with:
           name: tools-release-info
@@ -127,6 +140,14 @@ jobs:
         if: env.MODE == 'release'
         with:
           cache-read-only: false
+      - uses: actions/download-artifact@v4
+        if: env.MODE == 'release'
+        with:
+          name: tools-gradle-distribution
+          path: ${{ runner.temp }}/tools-gradle
+      - name: Prepare Gradle from the verified preflight artifact
+        if: env.MODE == 'release'
+        run: bash scripts/prepare-tools-gradle.sh "$RUNNER_TEMP/tools-gradle"
       - uses: actions/cache@v4
         if: env.MODE == 'release'
         with:
@@ -155,8 +176,7 @@ jobs:
         if: env.MODE == 'release'
         working-directory: android
         run: |
-          chmod +x gradlew
-          ./gradlew assembleProdRelease --no-daemon --max-workers=4 -PreactNativeArchitectures=arm64-v8a,x86_64
+          "$TOOLS_GRADLE_BIN" assembleProdRelease --no-daemon --max-workers=4 -PreactNativeArchitectures=arm64-v8a,x86_64
           mkdir -p ../output
           cp app/build/outputs/apk/prod/release/app-prod-release.apk ../output/app.apk
       - name: Verify the complete native payload

@@ -13,7 +13,7 @@ storage format so old conversation files can still be read.
 
 - Android application ID: `com.menachem.pocketpal.tools`
 - Launcher name: **PocketPal Tools**
-- Version: `1.22.1-tools.2` (Android version code 161)
+- Version: `1.22.1-tools.3` (Android version code 162)
 - Model download links: `pocketpaltools://hub/run?repo_id=author/model`
 
 The original `com.pocketpalai` application can stay installed. Each edition has
@@ -39,7 +39,8 @@ signing and publication without an active agent or a local APK download.
 2. Commit and push. Create an annotated tag matching the version, for example
    `v1.22.1-tools.2`, on that exact commit and push the tag. A normal branch push
    does not start a Tools APK build.
-3. Check the workflow's **preflight** job. After it succeeds and verification
+3. Check the workflow's **preflight** job, including the pinned Gradle download.
+   After it succeeds and verification
    starts, hand off the run link and end the chat. Follow the run to completion
    only if the user explicitly requests continued monitoring.
 
@@ -49,6 +50,12 @@ cold-launch check on an Android emulator, signs the APK,
 checks the fixed Tools certificate fingerprint, package ID and version, then
 creates and publishes the release. A failed job prevents publication. The
 existing tag is required, and published versions are never overwritten.
+
+Preflight downloads the exact wrapper-pinned Gradle distribution from official
+Gradle endpoints, with bounded alternate-host attempts and the wrapper's SHA-256
+check. The build job rechecks and uses that uploaded distribution directly;
+it does not need a second download through `services.gradle.org`. The wrapper's
+version and checksum remain the source of truth for both CI and local builds.
 
 Signing credentials live in the `pocketpal-tools-release` GitHub environment:
 `TOOLS_KEYSTORE_BASE64`, `TOOLS_STORE_PASSWORD`, `TOOLS_KEY_PASSWORD` and
