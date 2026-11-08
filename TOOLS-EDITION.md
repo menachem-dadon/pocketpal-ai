@@ -13,7 +13,7 @@ storage format so old conversation files can still be read.
 
 - Android application ID: `com.menachem.pocketpal.tools`
 - Launcher name: **PocketPal Tools**
-- Version: `1.22.1-tools.1` (Android version code 160)
+- Version: `1.22.1-tools.2` (Android version code 161)
 - Model download links: `pocketpaltools://hub/run?repo_id=author/model`
 
 The original `com.pocketpalai` application can stay installed. Each edition has
@@ -24,6 +24,9 @@ to separate installations and provider authorities.
 Firebase benchmark/feedback submission needs a new `google-services.json` with
 a client for this application ID. The upstream Firebase identity is not reused.
 Local chat and tools do not need Firebase.
+The optional native App Check package is registered only when the default
+Firebase app has been initialized. This prevents its eager constructor from
+crashing startup in installations without a matching Firebase configuration.
 
 ## Publishing an update
 
@@ -41,7 +44,8 @@ signing and publication without an active agent or a local APK download.
    only if the user explicitly requests continued monitoring.
 
 The release pipeline requires lint, TypeScript and unit tests to pass before
-the Android build. It verifies native libraries and DSP assets, signs the APK,
+the Android build. It verifies native libraries and DSP assets, performs a short
+cold-launch check on an Android emulator, signs the APK,
 checks the fixed Tools certificate fingerprint, package ID and version, then
 creates and publishes the release. A failed job prevents publication. The
 existing tag is required, and published versions are never overwritten.
@@ -71,3 +75,7 @@ and the workflow commit separately. The optional manual `source_release` input
 can select another published Tools APK; manual runs must also select a tag.
 
 The normal release path still runs all code checks and builds the new source.
+The cold-launch check installs the resulting APK, watches the process for
+15 seconds and checks Android's crash log. Startup logs and a screenshot are
+retained with the run. This check is independent of an active chat; full UI,
+model and device testing remains optional.

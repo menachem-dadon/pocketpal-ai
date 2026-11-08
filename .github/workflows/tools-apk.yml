@@ -168,9 +168,42 @@ jobs:
           retention-days: 7
           if-no-files-found: error
 
-  publish:
+  startup:
     needs: [preflight, build]
-    if: ${{ !cancelled() && needs.preflight.result == 'success' && needs.build.result == 'success' }}
+    if: ${{ !cancelled() && needs.preflight.outputs.mode == 'release' && needs.build.result == 'success' }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: tools-build
+          path: output
+      - name: Enable KVM for the startup check
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+      - name: Verify a cold launch on Android
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 35
+          arch: x86_64
+          target: default
+          ram-size: 2048M
+          disable-animations: true
+          emulator-options: -no-window -no-snapshot -noaudio -no-boot-anim -gpu swiftshader_indirect
+          script: bash scripts/verify-android-startup.sh output/app.apk startup-logs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: tools-startup-logs
+          path: startup-logs/
+          retention-days: 7
+
+  publish:
+    needs: [preflight, build, startup]
+    if: ${{ !cancelled() && needs.preflight.result == 'success' && needs.build.result == 'success' && (needs.startup.result == 'success' || needs.preflight.outputs.mode == 'validate') }}
     runs-on: ubuntu-24.04
     timeout-minutes: 20
     environment: pocketpal-tools-release

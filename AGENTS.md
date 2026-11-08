@@ -18,5 +18,6 @@ Before opening a pull request:
   when the user explicitly asks. Describe the release as pending until published.
 - GitHub handles building, signing and publication. Keep signing credentials in
   the release environment; avoid local APK downloads and signing for releases.
-- Device/emulator QA is optional for a release handoff unless the user requests
-  it or the pull-request requirements above apply.
+- The workflow's short Android cold-launch check must pass before publication;
+  it runs independently after chat handoff. Broader device/emulator QA is optional
+  unless the user requests it or the pull-request requirements above apply.

@@ -12,6 +12,8 @@ import com.facebook.react.defaults.DefaultReactHost.getDefaultReactHost
 import com.facebook.react.defaults.DefaultReactNativeHost
 import com.facebook.react.soloader.OpenSourceMergedSoMapping
 import com.facebook.soloader.SoLoader
+import com.google.firebase.FirebaseApp
+import io.invertase.firebase.appcheck.ReactNativeFirebaseAppCheckPackage
 import com.pocketpal.KeepAwakePackage
 import com.pocketpal.HardwareInfoPackage
 import com.pocketpal.NavigationBarPackage
@@ -23,6 +25,14 @@ class MainApplication : Application(), ReactApplication {
       object : DefaultReactNativeHost(this@MainApplication) {
         override fun getPackages(): List<ReactPackage> =
             PackageList(this).packages.apply {
+              // App Check's native module eagerly calls FirebaseAppCheck.getInstance().
+              // The Tools edition can run without a matching google-services.json;
+              // keep this optional module out of the bridge until a default app exists.
+              val hasDefaultFirebaseApp = FirebaseApp.getApps(this@MainApplication)
+                  .any { it.name == FirebaseApp.DEFAULT_APP_NAME }
+              if (!hasDefaultFirebaseApp) {
+                removeAll { it is ReactNativeFirebaseAppCheckPackage }
+              }
               // Packages that cannot be autolinked yet can be added manually here, for example:
               // add(MyReactNativePackage())
               add(KeepAwakePackage())
