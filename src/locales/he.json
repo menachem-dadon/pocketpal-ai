@@ -167,7 +167,7 @@
     "serverTypeHelp": "מזוהה אוטומטית; שנה אם זה לא נכון.",
     "internetSearch": {
       "title": "חיפוש באינטרנט",
-      "description": "אפשר ל-Pals לחפש ברשת באמצעות הכלים שלהם. השתמש במפתח API משלך — PocketPal לעולם לא שומר את המפתחות שלך ולא מנתב את השאילתות שלך.",
+      "description": "אפשר לצ'אטים שלך לחפש ברשת באמצעות כלים גלובליים. השתמש במפתח API משלך — PocketPal לעולם לא שומר את המפתחות שלך ולא מנתב את השאילתות שלך.",
       "providerLabel": "ספק חיפוש",
       "providerGated": "בקרוב",
       "keyLabel": "מפתח API",
@@ -1089,6 +1089,11 @@
       "resetToServerDefaultAccessibilityLabel": "אפס את {{name}} לברירת המחדל של השרת, {{value}}"
     }
   },
+  "toolsScreen": {
+    "description": "בחר את הכלים שיהיו זמינים בכל צ'אט. השינויים יחולו על שיחות חדשות וקיימות החל מההודעה הבאה.",
+    "searchHint": "חיפוש ברשת וקריאת אתרים דורשים ספק חיפוש מוגדר ואת הסכמתך. ייתכן שחלק מהמודלים לא תומכים בכלים.",
+    "searchSettings": "הגדר חיפוש ברשת"
+  },
   "palsScreen": {
     "sectionTitles": {
       "myPalsLocal": "ה-Pals שלי (מקומי)",
@@ -1260,6 +1265,7 @@
   "screenTitles": {
     "chat": "צ'אט",
     "models": "מודלים",
+    "tools": "כלים",
     "pals": "Pals (ניסיוני)",
     "benchmark": "מבחן ביצועים",
     "settings": "הגדרות",
